@@ -16,6 +16,9 @@ const store = createStore({
     },
     SET_DIALOG_VISIBLE(state, visible) {
       state.visible = visible;
+    },
+    setLoginVisible(state, payload) {
+      state.visible = payload;
     }
   },
   actions: {

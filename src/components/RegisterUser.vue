@@ -62,7 +62,7 @@
     }catch(error:any){
       console.error('There was an error sending the data!', error);
       response.value = { result: error.message };
-      alert('注册失败');
+      alert('密码长度至少8位，需要同时包含数字和字母');
     }
     
     };

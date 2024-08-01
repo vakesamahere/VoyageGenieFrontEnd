@@ -11,14 +11,45 @@
       />
     </transition-group>
   </div>
+  <!-- start of sendCommentButton -->
+    <div class="send-command-button">
+      <el-button icon="Edit" circle @click="dialogVisible = true" color="#eee" />
+    </div>
+  <!-- end of sendCommentButton -->
+
+  <!-- start of sendCommentDialog -->
+    <el-dialog title="发表伟论吧" v-model="dialogVisible">
+      <el-input
+        type="textarea"
+        :rows="4"
+        placeholder="Please input your reply"
+        v-model="replyContent">
+      </el-input>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="submitReply">Submit</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  <!-- end of sendCommentDialog -->
 </template>
 
 <script>
 import CommentItem from './CommentItem.vue';
 import axios from 'axios';
+import {
+  Edit,
+} from '@element-plus/icons-vue'
 export default {
   components: {
     CommentItem
+  },
+  data() {
+    return {
+      dialogVisible:false,
+      replyContent:'',
+    }
   },
   props: {
     comments: {
@@ -107,6 +138,11 @@ export default {
     },
     handleNewComment(content,){
       this.$emit('sendComment',content,0,false)
+    },
+    submitReply(){
+      this.handleNewComment(this.replyContent)
+      this.replyContent = '';
+      this.dialogVisible = false;
     }
   }
 };
@@ -114,7 +150,7 @@ export default {
 
 <style scoped>
 .comment-section {
-  width: 80vw;
+  width: 90%;
   margin: 0 auto;
   padding-top:5vh;
 }
@@ -136,5 +172,15 @@ export default {
 
 .comment-list-leave-active {
   position: absolute;
+}
+
+.send-command-button{
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    scale: 1.2;
+    position: fixed;
+    right: 0;
+    top: 0;
+    transform: translateX(-50%) translateY(10%);
 }
 </style>

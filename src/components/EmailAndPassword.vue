@@ -18,11 +18,11 @@
     </el-form-item>
     <el-form-item>
       <el-button color="#ff7f0e" class="login-button" @click="handleLogin">
-        登陆
+        登录
       </el-button>
     </el-form-item>
     <div class="form-links">
-        <el-link @click="register">注册登陆</el-link>
+        <el-link @click="register">注册登录</el-link>
         <el-link @click="recoverPassword">找回密码</el-link>
     </div>
   </el-form>
@@ -48,21 +48,23 @@ const handleSubmit = () => {
 };
   
 const handleLogin = async () => {
+    let resUserId = null;
     try{
       const res=await axios.post('http://1.94.170.22:5000/login', data.value);
       response.value=res.data;
       console.log(res.data.user_id);
-      setUserId(res.data.user_id);
-      emit('login');
+      resUserId = res.data.user_id
     }catch(error:any){
       console.error('There was an error sending the data!', error);
       response.value = { result: error.message };
     }
     if(response.value.result==0){
-      alert('登陆失败！未查询到邮箱或密码错误，请重新输入。');
+      alert('登录失败！未查询到邮箱或密码错误，请重新输入。');
     }
     else{
-      alert('登陆成功');
+      alert('登录成功');
+      setUserId(resUserId);
+      emit('login');
     }
 };
 

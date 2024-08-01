@@ -79,10 +79,14 @@ export default {
       showReplies: false,
       dialogVisible: false,
       replyContent: '',
-      currentUid: null,
     };
   },
   computed: {
+    currentUid:{
+      get() {
+        return this.$store.state.userId;
+      }
+    },
     replies() {
       return this.comments.filter(c => c.comment_id === this.comment.uid);
     },

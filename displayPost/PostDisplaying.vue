@@ -6,7 +6,7 @@
             <el-avatar :src="authorCover" circle @click="handleRedirectToAuthor" />
         </div>
         <div class="rightBarButton">
-            <el-button :type="likeButtonType" :icon="Sugar" circle @click="handleLike"/>
+            <el-button :type="likeButtonType" :icon="Pointer" circle @click="handleLike"/>
         </div>
         <div class="rightBarButton">
             <el-button :type="collectButtonType" :icon="Star" circle @click="handleCollect" />
@@ -18,9 +18,13 @@
             <el-button type="primary" :icon="Edit" circle @click="handleRedirectToEdit" />
         </div>
     </div>
-    <div class="commentBlock" id="commentBlock">
-        <commentBlock :comments="comments" @sendComment="handleCommentSend"></commentBlock>
-    </div>
+    <transition :name="commentTransition">
+        <div v-if="showCommentBlock" class="commentBlock" id="commentBlock">
+            <commentBlock :comments="comments" @sendComment="handleCommentSend">
+
+            </commentBlock>
+        </div>
+    </transition>
 </template>
 
 <script lang="ts" setup>
@@ -28,7 +32,7 @@ import {
   Edit,
   Star,
   Comment,
-  Sugar
+  Pointer
 } from '@element-plus/icons-vue'
 </script>
 
@@ -117,7 +121,8 @@ export default {
         islike: 0,
         iscollect: 0,
         author:{
-        }
+        },
+        showCommentBlock:false
     }
   },
   components:{
@@ -152,13 +157,15 @@ export default {
     handleCommentDisplay() {
         if(document.getElementById('commentBlock')?.classList.contains('commentBlockDisplay')){
             this.handleCommentHide();
-            return;           
+            return;
         }
         console.log('comment display');
+        this.showCommentBlock=true;
         document.getElementById('commentBlock')?.classList.add('commentBlockDisplay')
     },
     handleCommentHide() {
         console.log('comment hide');
+        this.showCommentBlock=false;
         document.getElementById('commentBlock')?.classList.remove('commentBlockDisplay')
     },
     async handleCommentSend(commentString:string,commentId:number,reply:boolean) {
@@ -197,6 +204,9 @@ export default {
     this.getPostContent();
   },
   computed:{
+    commentTransition() {
+        return this.showCommentBlock?'slide-ud':'slide-du'
+    },
     likeButtonType(){
         if(this.islike==0){
             return "primary"
@@ -429,7 +439,8 @@ export default {
     width: 90%;
     height: 70%;
     position:absolute;
-    top: 120vh;
+    /* top: 120vh; */
+    top:29%;
     left: 5vh;
     transition: top 0.3s ease-in-out;
     background-color: #eeeeee;
@@ -460,6 +471,26 @@ export default {
     padding-top: 1vh;
     padding-bottom: 1vh;
     scale: 1.2;
+}
+
+.slide-du-enter-active, .slide-du-leave-active {
+  transition: all 0.5s;
+}
+.slide-du-enter-from {
+  transform: translateY(-100vh);
+}
+.slide-du-leave-to {
+  transform: translateY(100vh);
+}
+
+.slide-ud-enter-active, .slide-ud-leave-active {
+  transition: all 0.5s;
+}
+.slide-ud-enter-from {
+  transform: translateY(100vh);
+}
+.slide-ud-leave-to {
+  transform: translateY(-100vh);
 }
 
 </style>
