@@ -12,25 +12,37 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
-      meta: { requiresAuth: true } 
+      meta: { 
+        requiresAuth: true,
+        index:4
+      } 
     },
     {
       path: '/:chatId', // 使用id作为动态路由参数
       name: 'chat',
       component: () => import('../components/Planner.vue'),
-      meta: { requiresAuth: true } 
+      meta: { 
+        requiresAuth: true,
+        index:2
+      } 
     },
     {
       path: '/square',
       name: 'square',
       component:  () => import('../views/SquareView.vue'),
-      meta: { requiresAuth: true } 
+      meta: { 
+        requiresAuth: true,
+        index:1
+      } 
     },
     {
       path: '/data',
       name:'data',
       component:() => import('../components/Data.vue'),
-      meta: { requiresAuth: true } 
+      meta: {
+        requiresAuth: true,
+        index:3
+      } 
     },
     {
       path: '/help',
@@ -77,6 +89,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  // 测试，免登录
+  next()
   // 检查用户是否登录，如果未登录且尝试访问需要登录的页面，则跳转到登录界面
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const isLoggedIn = store.state.isLoggedIn;

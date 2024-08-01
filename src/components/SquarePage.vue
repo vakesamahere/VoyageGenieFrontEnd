@@ -1,6 +1,6 @@
 <template>
     <div class="container-box">
-        <div class="search-container">
+        <div class="search-container" v-if="false">
             <searchbox class="search-box" @search="handleSearch"></searchbox>
         </div>
         <div class="waterfall-container">
