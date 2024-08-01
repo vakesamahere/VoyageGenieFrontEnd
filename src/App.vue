@@ -23,20 +23,57 @@
           <el-menu-item index="/chat" router class="menu-item">Chat</el-menu-item>
           <el-menu-item index="/home" router class="menu-item">Home</el-menu-item>
           <el-menu-item index="/about" router class="menu-item">About</el-menu-item>
+          <!-- start of user profile -->
+            <el-popover
+              title="通知"
+              trigger="hover"
+              >
+              <NoticeBox style="max-height: 180px;overflow-y: auto;" :user_id="userId" @enterPost="handleEnterPost" @enterUser="handleEnterUser"/>
+              <div class="menu-user">
+                <div @click="goUserSafety" class="menu-user-item">
+                  <el-icon><Lock /></el-icon>
+                </div>
+                <div @click="goUserInfo" class="menu-user-item">
+                  <el-icon><User /></el-icon>
+                </div>
+                <div @click="goHelp" class="menu-user-item">
+                  <el-icon><Help /></el-icon>
+                </div>
+              </div>
+              <template #reference>
+                <el-avatar src="https://tse2-mm.cn.bing.net/th/id/OIP-C.q3irb_--_nSoO-ID35c1nwHaHa?w=148&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7" circle class="menu-avatar" @click="goUserInfo"></el-avatar>
+              </template>
+            </el-popover>
+          <!-- end of user profile -->
         </el-menu>
         <!-- end of top bar -->
     
         <!-- start of subwin container -->
         <el-main class="main" :class="{'blur':isSearchVisible}">
             <router-view :currentChat="currentChat" v-slot="{ Component }">
-            <transition :name="slideMode" mode="out-in">
-              <keep-alive>
-                <component :is="Component"></component>
-              </keep-alive>
-            </transition>
+              <transition :name="slideMode" mode="out-in">
+                <keep-alive>
+                  <component :is="Component"></component>
+                </keep-alive>
+              </transition>
             </router-view>
         </el-main>
         <!-- end of subwin container -->
+        
+        <!-- start of login box -->
+        <el-dialog
+          v-model="loginVisible"
+          :width="dialogWidth"
+          :height="dialogWidth"
+          align-center
+          style="overflow-x: hidden;box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);border-radius: 8px;"
+        >
+          <span>
+            <LoginBox @handleLogin="handleLogin"/>
+          </span>
+        </el-dialog>
+        <!-- <LoginBox class="login-box" :v-if="loginVisible" @handleLogin="handleLogin"></LoginBox> -->
+        <!-- end of login box -->
     </el-container>
 
     <transition name="fade">
@@ -49,6 +86,10 @@
 </template>
 
 <script>
+import LoginBox from './components/LoginBox.vue';
+import NotificationPage from './components/NotificationPage.vue';
+import store from './store';
+
 export default {
   data() {
     return {
@@ -56,8 +97,12 @@ export default {
       menuTextColor:"#000",
       lastIndex:1,
       isSearchVisible:false,
-      searchQuery:''
+      searchQuery:'',
     };
+  },
+  components:{
+    NotificationPage,
+    LoginBox
   },
   computed: {
     slideMode() {
@@ -67,6 +112,14 @@ export default {
       const res = currentIndex > this.lastIndex ? 'slide-lr' : 'slide-rl';
       this.lastIndex = currentIndex
       return res
+    },
+    loginVisible: {
+      get() {
+        return this.$store.state.visible;
+      },
+      set(value) {
+        this.$store.commit('setLoginVisible', value);
+      }
     }
   },
   methods: {
@@ -102,6 +155,36 @@ export default {
       if (event.key === 'Escape') {
         this.handleSearchClose();
       }
+    },
+    goUserInfo() {
+      if(!store.state.userId){
+        console.log('未登录');
+        this.showLogin()
+        return
+      }
+      this.$router.push('/data')
+    },
+    goUserSafety() {
+      if(!store.state.userId){
+        console.log('未登录');
+        this.showLogin()
+        return
+      }
+      this.$router.push('/safety')
+    },
+    goHelp() {
+      if(!store.state.userId){
+        console.log('未登录');
+        this.showLogin()
+        return
+      }
+      this.$router.push('/help')
+    },
+    showLogin() {
+      this.$store.commit('setLoginVisible',true)
+    },
+    handleLogin(){
+      this.$store.commit('setLoginVisible',false)
     }
   },
   mounted() {
@@ -182,6 +265,20 @@ export default {
   padding: 0;
   transition: all 0.25s ease-in-out;
 }
+.menu-user {
+  z-index: 1;
+  height: 3vh;
+  user-select: none;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+.menu-user-item {
+  width: 2vw;
+  text-align: center;
+  /* border: 1px solid black; */
+  width: 33.3%;
+}
 .menu {
   z-index: 1;
   height: 7vh;
@@ -189,6 +286,19 @@ export default {
 }
 .menu-item {
   width: 5vw;
+  font-size: 1.8vh;
+}
+.menu-avatar {
+  align-self: center;
+  position: absolute;
+  right: 2vw;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.4s ease-out 0.06s;
+}
+.menu-avatar:hover {
+  scale: 2;
+  transform: translateX(-40%) translateY(-10%);
 }
 .el-menu--horizontal>.el-menu-item.is-active,
 .el-menu--horizontal>.el-menu-item {

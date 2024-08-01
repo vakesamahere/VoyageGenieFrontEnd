@@ -12,20 +12,44 @@
   :isLoading="loading"
   :isOver="over"
   :animation="false"
+  :scrollReachBottom="displayMore"
+
   class="waterfall"
-  @scrollReachBottom="getNext"
   >
     <template v-slot:default="slotProp">
         <div class="list-item">
           <!-- <a href="#" @click="cli(slotProp.item)"> -->
-            <div class="cover-wrapper">
+            <div class="cover-wrapper" @click="cli(slotProp.item)">
               <img v-if="slotProp.item.cover" :src="slotProp.item.cover" data-key="cover" class="cover" />
             </div>
             <div class="brief">
               <div class="card-title">{{ slotProp.item.title }}</div>
               <div class="author-info">
-                <img class="card-profile" :src="slotProp.item.author.cover">
-                <div class="card-name">{{ slotProp.item.author.name }}</div>
+                <!-- <img class="card-profile" :src="slotProp.item.author.cover"> -->
+                <!-- start of author info -->
+                <el-popover
+                  show-after="500"
+                  :title="slotProp.item.authorName"
+                  trigger="hover"
+                  >
+                  <div class="menu-author">
+                    <div @click="goUserSafety" class="menu-author-item">
+                      <div class="subscribe-button" @click="handleSubscribe(slotProp.item)">
+                        <div v-if="slotProp.item.subscribe">
+                          <el-icon><Close /></el-icon> 取消关注
+                        </div>
+                        <div v-else>
+                          <el-icon><Plus /></el-icon> 关注
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <template #reference>
+                    <el-avatar :src="slotProp.item.authorCover" circle class="author-avatar" @click="goUserInfo"></el-avatar>
+                  </template>
+                </el-popover>
+                <!-- end of author info -->
+                <div class="card-name">{{ slotProp.item.authorName }}</div>
               </div>
             </div>
           <!-- </a> -->
@@ -36,6 +60,7 @@
   </template>
   
   <script>
+  import axios from 'axios';
   export default{
     props:{
       msg:String,
@@ -60,7 +85,7 @@
       nOfCol(){
         const ratio =this.containerWidth*0.618*9/this.winHeight;
         let res = Math.floor(ratio)
-        if(res>5){res=5}
+        if(res>6){res=6}
         if(res>3 && res<5){res=4}
         if(res<=3){res=2}
         console.log('nOfCol:',res,this.containerWidth,this.winHeight);
@@ -95,6 +120,18 @@
         console.log(document.getElementById('waterfallContainer').getBoundingClientRect().width);
         this.vkey+=1
         this.verifyRerander(this.vkey)
+      },
+      handleSubscribe(target){
+        console.log('subscribe');
+        const targetId = target.author
+        axios.post('http://1.94.170.22:5000/toggle_subscribe',{
+            "target_id":targetId,
+            "user_id":this.$store.state.userId
+        })
+        if(target.subscribe==null){
+          target.subscribe=0
+        }
+        target.subscribe = 1-target.subscribe
       }
     },
     mounted(){
@@ -133,6 +170,9 @@
   font-size: 0; /*非常重要*/
   /* border: 1px solid black */
   }
+  .cover-wrapper:hover {
+    background-color: rgba(0,0,0,0.5);
+  }
   .cover {
   max-width: 100%;
   width: 100%;
@@ -140,11 +180,13 @@
   height: auto;
   border-radius: 10px;
   transition: transform 0.3s ease-out;
+  background-color: black;
   /* border: 1px solid black */
   }
   .cover:hover{
     transform: scale(1.2);
     transform-origin: center center;
+    opacity: 0.8;
   }
   .card-profile{
     height: 2vw;
@@ -155,7 +197,8 @@
     /* border: 1px solid black */
   }
   .card-name{
-    
+    color: black;
+    align-self: center;
   }
   .back {
   background-color: #fff;
@@ -164,6 +207,7 @@
   font-size:2vh;
   margin-top: auto;
   margin-left: auto;
+  color: black;
   }
   a {
     text-decoration: none;
@@ -177,5 +221,21 @@
   .brief {
     max-height: 10vh;
     /* border: 1px solid black; */
+  }
+
+  .author-avatar {
+    height: 2vw;
+    width: 2vw;
+    object-fit: cover;
+    align-self: center;
+    transition: all 0.4s ease-out 0.4s;
+    margin-right: 2%;
+  }
+  .author-avatar:hover {
+    scale: 1.3;
+    transform: translateX(10%) translateY(-10%);
+  }
+  .subscribe-button{
+    cursor: pointer;
   }
   </style>

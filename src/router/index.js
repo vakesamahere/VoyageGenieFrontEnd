@@ -41,20 +41,25 @@ const router = createRouter({
       component:() => import('../components/Data.vue'),
       meta: {
         requiresAuth: true,
-        index:3
+        index:9
       } 
     },
     {
       path: '/help',
       name:'help',
       component:() => import('../components/Help.vue'),
-      
+      meta: {
+        index:10
+      }
     },
     {
       path: '/safety',
       name:'safety',
       component:() => import('../components/Safety.vue'),
-      meta: { requiresAuth: true } 
+      meta: { 
+        requiresAuth: true, 
+        index:8
+      } 
     },
     {
       path: '/home',
@@ -93,7 +98,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   // 测试，免登录
-  next()
+  // next()
   // 检查用户是否登录，如果未登录且尝试访问需要登录的页面，则跳转到登录界面
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const isLoggedIn = store.state.isLoggedIn;
@@ -105,7 +110,9 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
-
+window.addEventListener('beforeunload', () => {
+  window.location.href = '/';
+});
 router.afterEach(() => {
   if (!store.state.isLoggedIn && store.state.visible) {
     app.showDialog();

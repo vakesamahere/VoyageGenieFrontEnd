@@ -73,7 +73,7 @@ export default {
                         }
                     },
                 ]
-                for(let i=0;i<50;i++){
+                for(let i=0;i<10;i++){
                     let temp = {
                         "id":i,
                         "cover": testPosts[(i^2)%3].cover,
