@@ -27,3 +27,6 @@ app.use(router)
 app.use(ElementPlus, { size: 'small', zIndex: 3000 })
 
 app.mount('#app')
+
+const _test = true
+export {_test}

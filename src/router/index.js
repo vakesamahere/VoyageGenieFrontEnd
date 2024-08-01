@@ -60,7 +60,10 @@ const router = createRouter({
       path: '/home',
       name:'home',
       component:HomeView,
-      meta: { requiresAuth: true } ,
+      meta: { 
+        requiresAuth: true,
+        index:3
+      } ,
       children: [
         {
           path: 'interest',

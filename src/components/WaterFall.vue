@@ -17,21 +17,18 @@
   >
     <template v-slot:default="slotProp">
         <div class="list-item">
-          <a href="#" @click="cli(slotProp.item)">
+          <!-- <a href="#" @click="cli(slotProp.item)"> -->
             <div class="cover-wrapper">
               <img v-if="slotProp.item.cover" :src="slotProp.item.cover" data-key="cover" class="cover" />
             </div>
             <div class="brief">
-              <p class="card-title">{{ slotProp.item.title }}</p>
+              <div class="card-title">{{ slotProp.item.title }}</div>
+              <div class="author-info">
+                <img class="card-profile" :src="slotProp.item.author.cover">
+                <div class="card-name">{{ slotProp.item.author.name }}</div>
+              </div>
             </div>
-          </a>
-          <div class="outline-bottom">
-            <p class="article-tags">
-              <span v-for="tag of slotProp.item.tags+''" :key="tag" class="tag">
-                {{ tag }}
-              </span>
-            </p>
-          </div>
+          <!-- </a> -->
         </div>
       </template>
   </v3-waterfall>
@@ -117,25 +114,54 @@
   display: none
   }
   .list-item {
-  border-radius: 15px;
+  /* border-radius: 15px; */
   overflow: hidden;
-  background-color: lightblue;
-  filter: drop-shadow(0 0 15px #555) drop-shadow(0 0 45px #555);
+  background-color: transparent;
+  /* filter: drop-shadow(0 0 5px #555) drop-shadow(0 0 1px #555); */
   }
   .list-item:hover{
-  filter: drop-shadow(0 0 5px #000) drop-shadow(0 0 15px #111) drop-shadow(0 0 45px #111);
+    background-color: transparent;
+  /* filter: drop-shadow(0 0 5px #000) drop-shadow(0 0 15px #111) drop-shadow(0 0 45px #111); */
+  }
+  .cover-wrapper {
+  max-width: 100%;
+  width: 100%;
+  max-height: none;
+  height: auto;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 0; /*非常重要*/
+  /* border: 1px solid black */
   }
   .cover {
   max-width: 100%;
   width: 100%;
   max-height: none;
   height: auto;
+  border-radius: 10px;
+  transition: transform 0.3s ease-out;
+  /* border: 1px solid black */
+  }
+  .cover:hover{
+    transform: scale(1.2);
+    transform-origin: center center;
+  }
+  .card-profile{
+    height: 2vw;
+    width: 2vw;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 0.2vw;
+    /* border: 1px solid black */
+  }
+  .card-name{
+    
   }
   .back {
   background-color: #fff;
   }
   .card-title {
-  font-size:larger;
+  font-size:2vh;
   margin-top: auto;
   margin-left: auto;
   }
@@ -143,5 +169,13 @@
     text-decoration: none;
     color: black;
     font-weight: bold;
+  }
+  .author-info {
+    display: flex;
+    flex-direction: row;
+  }
+  .brief {
+    max-height: 10vh;
+    /* border: 1px solid black; */
   }
   </style>

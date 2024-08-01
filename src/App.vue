@@ -6,18 +6,23 @@
           class="el-menu-demo menu"
           mode="horizontal"
           :background-color="bgColorAll"
-          text-color="#fff"
-          active-text-color="#fff"
+          :text-color="menuTextColor"
+          :active-text-color="menuTextColor"
           @select="handleSelect"
           router
         >
-          <img alt="Genie logo" class="genie" src="@/assets/genie.png"/>
+          <!-- <img alt="Genie logo" class="genie" src="@/assets/genie.png"/> -->
+          <div class="menulogo"
+            :style="{color:menuTextColor}"
+          >VG</div>
           <el-col :span="1"></el-col>
-          <el-button icon="Search" circle class="SearchButton" @click = "handleSearchClick"/>
-          <el-menu-item index="/square" router>Square</el-menu-item>
-          <el-menu-item index="/chat" router>Chat</el-menu-item>
-          <el-menu-item index="/data" router>Home</el-menu-item>
-          <el-menu-item index="/about" router>About</el-menu-item>
+          <el-button icon="Search" circle class="SearchButton" @click = "handleSearchClick" 
+            :style="{color:menuTextColor}"
+          />
+          <el-menu-item index="/square" router class="menu-item">Square</el-menu-item>
+          <el-menu-item index="/chat" router class="menu-item">Chat</el-menu-item>
+          <el-menu-item index="/home" router class="menu-item">Home</el-menu-item>
+          <el-menu-item index="/about" router class="menu-item">About</el-menu-item>
         </el-menu>
         <!-- end of top bar -->
     
@@ -47,7 +52,8 @@
 export default {
   data() {
     return {
-      bgColorAll:"#545c64",
+      bgColorAll:"#fff",//"#545c64",
+      menuTextColor:"#000",
       lastIndex:1,
       isSearchVisible:false,
       searchQuery:''
@@ -121,23 +127,27 @@ export default {
 
 <style scoped>
 .slide-lr-enter-active, .slide-lr-leave-active {
-  transition: transform 0.5s;
+  transition: all 0.4s;
 }
 .slide-lr-enter-from {
-  transform: translateX(100%);
+  transform: translateX(30%);
+  opacity: 0;
 }
 .slide-lr-leave-to {
-  transform: translateX(-100%);
+  transform: translateX(-70%);
+  opacity: 0;
 }
 
 .slide-rl-enter-active, .slide-rl-leave-active {
-  transition: transform 0.5s;
+  transition: all 0.5s;
 }
 .slide-rl-enter-from {
-  transform: translateX(-100%);
+  transform: translateX(-30%);
+  opacity: 0;
 }
 .slide-rl-leave-to {
-  transform: translateX(100%);
+  transform: translateX(70%);
+  opacity: 0;
 }
 
 .fade-enter-active, .fade-leave-active {
@@ -175,6 +185,10 @@ export default {
 .menu {
   z-index: 1;
   height: 7vh;
+  user-select: none;
+}
+.menu-item {
+  width: 5vw;
 }
 .el-menu--horizontal>.el-menu-item.is-active,
 .el-menu--horizontal>.el-menu-item {
@@ -183,7 +197,6 @@ export default {
 .SearchButton {
   align-self: center;
   background-color: transparent;
-  color: #fff;
   border: none;
 }
 .SearchButton:hover {
@@ -243,5 +256,11 @@ export default {
   position: fixed;
   right: 1vh;
   top: 1vh;
+}
+.menulogo{
+  text-align: center;
+  align-self: center;
+  padding-left: 2vw;
+  color: #fff;
 }
 </style>
