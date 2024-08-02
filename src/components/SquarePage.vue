@@ -15,6 +15,7 @@ import waterfall from './WaterFall.vue'
 import searchbox from './SearchBox.vue'
 import axios from 'axios'
 import {_test} from '@/main.js'
+import testCovers from '@/assets/test_covers'
 export default {
     components:{
         waterfall,
@@ -44,48 +45,7 @@ export default {
             console.log(res);
             this.posts=res.data
             if(_test){
-                let testPosts = [
-                    {
-                        "id":1,
-                        "cover": "https://lingdian-image.oss-cn-shenzhen.aliyuncs.com/20200420/6a661df531a854d30bc97dfe67a1b1baoutput_00002.jpg",
-                        "title": "Item Title",
-                        "author": {
-                            "cover": "https://tse2-mm.cn.bing.net/th/id/OIP-C.q3irb_--_nSoO-ID35c1nwHaHa?w=148&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7",
-                            "name": "Author Name"
-                        }
-                    },
-                    {
-                        "id":2,
-                        "cover": "https://ts1.cn.mm.bing.net/th/id/R-C.f32d3f1b718d909a22c0be4971e034d2?rik=UiCwhzmzj7sKTQ&riu=http%3a%2f%2fimg95.699pic.com%2fphoto%2f50046%2f6569.jpg_wh860.jpg&ehk=Q40G%2fDHkvrYUY1kJs%2faRSQuCeJVGttb5yl7jYCmTdY4%3d&risl=&pid=ImgRaw&r=0",
-                        "title": "Item Title",
-                        "author": {
-                            "cover": "https://tse2-mm.cn.bing.net/th/id/OIP-C.q3irb_--_nSoO-ID35c1nwHaHa?w=148&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7",
-                            "name": "Author Name"
-                        }
-                    },
-                    {
-                        "id":3,
-                        "cover": "https://tse3-mm.cn.bing.net/th/id/OIP-C.7PMYm8Xe4PPDFYCCvhCe0QHaE7?rs=1&pid=ImgDetMain",
-                        "title": "Item Title",
-                        "author": {
-                            "cover": "https://tse2-mm.cn.bing.net/th/id/OIP-C.q3irb_--_nSoO-ID35c1nwHaHa?w=148&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7",
-                            "name": "Author Name"
-                        }
-                    },
-                ]
-                for(let i=0;i<10;i++){
-                    let temp = {
-                        "id":i,
-                        "cover": testPosts[(i^2)%3].cover,
-                        "title": "Item Title "+i.toString(),
-                        "author": {
-                            "cover": "https://tse2-mm.cn.bing.net/th/id/OIP-C.q3irb_--_nSoO-ID35c1nwHaHa?w=148&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7",
-                            "name": "Author Name"
-                        }
-                    }
-                    this.posts.push(temp)
-                }
-                // this.posts = this.posts.concat(testPosts)
+                this.posts = this.posts.concat(testCovers)
             }
         },
         handleEnterPost(item){
