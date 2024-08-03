@@ -27,6 +27,7 @@
             <el-popover
               title="通知"
               trigger="hover"
+              :show-arrow="false"
               >
               <NoticeBox style="max-height: 180px;overflow-y: auto;" :user_id="userId" @enterPost="handleEnterPost" @enterUser="handleEnterUser"/>
               <div class="menu-user">
@@ -206,6 +207,8 @@ export default {
     margin: 0 0 0 0;
     background-color: "#545c64";
 }
+
+
 </style>
 
 <style scoped>

@@ -132,7 +132,7 @@ export default {
   methods: {
     handleLike() {
         console.log('like');
-        alert(this.user_id)
+        alert(this.userId)
         axios.post('http://1.94.170.22:5000/toggle_like',{
             "post_id":this.postId,
             "user_id":this.userId
