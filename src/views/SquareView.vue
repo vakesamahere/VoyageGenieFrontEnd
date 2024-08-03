@@ -10,7 +10,7 @@
                 destroyOnClose="true"
                 >
                   <span>
-                    <PostDisplaying :user_id="userId" :postId="postId"/>
+                    <PostDisplaying :userId="userId" :postId="postId"/>
                   </span>
 
               </el-dialog>
@@ -44,7 +44,7 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
 });
 
 function handleEnterPost(id){
-  
+  alert(userId.value)
   postId.value = id;
   dialogVisible.value = true;
 }

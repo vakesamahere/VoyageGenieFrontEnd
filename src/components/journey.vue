@@ -47,6 +47,9 @@
   
   <script>
   import axios from 'axios';
+  import { ref, computed, watch } from 'vue';
+  import { useStore } from 'vuex';
+
   export default{
     props:{
       msg:String,
