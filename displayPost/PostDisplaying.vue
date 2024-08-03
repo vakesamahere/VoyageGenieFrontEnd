@@ -201,6 +201,7 @@ export default {
   },
   mounted() {
     //
+
     this.getPostContent();
   },
   computed:{
@@ -230,7 +231,7 @@ export default {
             return ""
         }
         return info.cover
-    }
+    },
   }
 };
 

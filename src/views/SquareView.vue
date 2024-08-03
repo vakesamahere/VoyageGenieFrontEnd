@@ -7,10 +7,10 @@
                 v-model="dialogVisible"
                 :width="dialogWidth"
                 align-center
-
+                destroyOnClose="true"
                 >
                   <span>
-                    <PostDisplaying :user_id="userId" :postId="1"/>
+                    <PostDisplaying :user_id="userId" :postId="postId"/>
                   </span>
 
               </el-dialog>
@@ -31,6 +31,7 @@
 const store = useStore();
 const userId = ref(store.state.userId);
 const dialogWidth = ref('60%'); // 默认宽度为60%
+const postId = ref(null);
 let resizeListener = null;
 
 // 使用getter获取userId
@@ -42,7 +43,9 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
 // 执行其他需要的操作
 });
 
-function handleEnterPost(){
+function handleEnterPost(id){
+  
+  postId.value = id;
   dialogVisible.value = true;
 }
 
