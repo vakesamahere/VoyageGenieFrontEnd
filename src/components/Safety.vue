@@ -148,7 +148,7 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
 }
 .tag{
     font-size: 20px;
-    padding-left: 10%;
+    padding-left: 9%;
     font-weight: bold;
     display: flex;
     justify-content: flex-start;
