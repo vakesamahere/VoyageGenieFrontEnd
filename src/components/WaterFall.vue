@@ -3,16 +3,18 @@
       <p style="height: 20px;"></p>
     <v3-waterfall ref="wf"
   :key="vvkey"
-  :list="list"
+  :list="localList"
   :colWidth="widthOfCol"
   :gap="widthOfGap"
-  :virtual-time="400"
   :scrollBodySelector="isLimit ? '.limit-box' : ''"
   :isMounted="isMounted"
   :isLoading="loading"
   :isOver="over"
-  :animation="false"
-  :scrollReachBottom="displayMore"
+  :animation="true"
+  @scroll-reach-bottom="displayMore"
+  :virtualLength="500"
+  :distanceToScroll="800"
+  overText="over"
 
   class="waterfall"
   >
@@ -23,14 +25,35 @@
               <img v-if="slotProp.item.cover" :src="slotProp.item.cover" data-key="cover" class="cover" />
             </div>
             <div class="brief">
-              <div class="card-title">{{ slotProp.item.title }}</div>
+
+              <div class="card-container">
+                <div class="card-title">{{ slotProp.item.title }}</div>
+                <div class="buttons-container">
+                  <div class="post-i-button" @click="handleLike(slotProp.item)">
+                    <div class="col-trans">
+                      <transition name="slide-du">
+                          <el-icon v-if="getButtonType(slotProp.item.islike)"><SuccessFilled /></el-icon>
+                          <el-icon v-else><Pointer /></el-icon>
+                      </transition>
+                    </div>
+                  </div>
+                  <div class="post-i-button" @click="handleCollect(slotProp.item)" >
+                    <div class="col-trans">
+                      <transition name="slide-du">
+                        <el-icon v-if="getButtonType(slotProp.item.iscollect)"><StarFilled /></el-icon>
+                        <el-icon v-else><Star /></el-icon>
+                      </transition>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div class="author-info">
                 <!-- <img class="card-profile" :src="slotProp.item.author.cover"> -->
                 <!-- start of author info -->
                 <el-popover
-                  show-after="500"
                   :title="slotProp.item.authorName"
                   trigger="hover"
+                  :show-after="750"
                   >
                   <div class="menu-author">
                     <div @click="goUserSafety" class="menu-author-item">
@@ -45,7 +68,7 @@
                     </div>
                   </div>
                   <template #reference>
-                    <el-avatar :src="slotProp.item.authorCover" circle class="author-avatar" @click="goUserInfo"></el-avatar>
+                    <el-avatar :src="slotProp.item.authorCover" circle class="author-avatar" @click="goUserInfo(slotProp.item.author)"></el-avatar>
                   </template>
                 </el-popover>
                 <!-- end of author info -->
@@ -61,10 +84,17 @@
   
   <script>
   import axios from 'axios';
+  import { Pointer, Star } from '@element-plus/icons-vue';
   export default{
     props:{
       msg:String,
       list:[]
+    },
+    watch: {
+      list(oldValue,newValue){
+        this.localList=[]
+        this.localList=this.nextChunk
+      }
     },
     data(){
       return{
@@ -78,7 +108,8 @@
         isLimit:false,
         vkey:0,
         vvkey:0,
-        gapRatio:0.01
+        gapRatio:0.01,
+        localList:[]
       }
     },
     computed:{
@@ -89,7 +120,17 @@
         if(res>3 && res<5){res=4}
         if(res<=3){res=2}
         console.log('nOfCol:',res,this.containerWidth,this.winHeight);
-        return res
+        return res?res:5
+      },
+      cuIndex(){
+        return this.localList.length
+      },
+      nextEnd(){        
+        return Math.min(this.localList.length+5*this.nOfCol,this.list.length)
+      },
+      nextChunk(){
+        // alert(this.nextEnd);
+        return this.list.slice(this.cuIndex,this.nextEnd)
       },
       widthOfCol(){
         const res = this.containerWidth*(1-this.gapRatio*(this.nOfCol+1))/this.nOfCol
@@ -101,9 +142,39 @@
       }
     },
     methods:{
+      handleLike(item) {
+        console.log('like');
+        if(item.islike===undefined){
+          item.islike=0
+        }
+        item.islike = 1 - item.islike;
+        axios.post('http://1.94.170.22:5000/toggle_like',{
+            "post_id":item.uid,
+            "user_id":this.$store.state.userId
+        })
+      },
+      handleCollect(item) {
+        console.log('collect');
+        if(item.iscollect===undefined){
+          item.iscollect=0
+        }
+        // 发送请求 toggling collect status
+        item.iscollect = 1 - item.iscollect;
+        axios.post('http://1.94.170.22:5000/toggle_collection',{
+            "post_id":item.uid,
+            "user_id":this.$store.state.userId
+        })
+      },
+      getButtonType(bit) {
+        console.log(bit)
+        return (bit === 0) || (bit ===undefined) ? false : true;
+      },
       cli(item){
         console.log(item);
         this.$emit('enterPost',item)
+      },
+      displayMore(){
+        this.localList=this.localList.concat(this.nextChunk)
       },
       verifyRerander(v){
         setTimeout(() => {
@@ -132,17 +203,44 @@
           target.subscribe=0
         }
         target.subscribe = 1-target.subscribe
+      },
+      async autoRefresh(){
+        this.localList=this.localList.concat([])
+        await setTimeout(() => {
+          this.autoRefresh()
+        }, 500);
+      },
+      goUserInfo(authorId){
+        this.$emit('goUserInfo',authorId)
       }
     },
     mounted(){
       window.addEventListener('resize',this.reranderV);
-      this.reranderV()
-      this.vvkey+=1;
+      setTimeout(() => {
+        this.localList=[]
+        const n = this.nOfCol
+        this.localList=this.localList.concat(this.nextChunk)
+        this.reranderV()
+        this.vvkey+=1;
+      }, 100);
+      this.autoRefresh()
     }
   };
   </script>
   
   <style scoped>
+  * {
+    color: #bbb
+  }
+  .author-info *:hover,
+  .cover-wrapper:hover,
+  .card-title:hover {
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    color: #fff;
+  }
+
   .father-box {
   overflow-y:scroll;
   width: 100%;
@@ -197,21 +295,22 @@
     /* border: 1px solid black */
   }
   .card-name{
-    color: black;
+    /* color: black; */
     align-self: center;
   }
   .back {
-  background-color: #fff;
+  background-color: var(--bg-color);
   }
   .card-title {
-  font-size:2vh;
+  font-size:1.5vh;
   margin-top: auto;
   margin-left: auto;
-  color: black;
+  flex:1
+  /* color: black; */
   }
   a {
     text-decoration: none;
-    color: black;
+    /* color: black; */
     font-weight: bold;
   }
   .author-info {
@@ -228,14 +327,58 @@
     width: 2vw;
     object-fit: cover;
     align-self: center;
-    transition: all 0.4s ease-out 0.4s;
+    transition: all 0.4s ease-out 0.1s;
     margin-right: 2%;
   }
   .author-avatar:hover {
-    scale: 1.3;
-    transform: translateX(10%) translateY(-10%);
+    scale: 1.1;
+    transform: translateX(5%) translateY(-5%);
   }
   .subscribe-button{
     cursor: pointer;
   }
+
+
+  
+  .buttons-container {
+    display: flex;
+    gap:0.4vw;
+    margin-right: 0.2vw;
+    height: 100%;
+  }
+  .card-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .post-i-button {
+    margin: 0;
+    background-color: transparent;
+    border: none;
+    flex-shrink: 0;
+    scale: 1.1;
+    opacity: 0.9;
+  }
+
+  
+
+.slide-du-enter-active, .slide-du-leave-active {
+  transition: all 0.3s;
+}
+.slide-du-enter-from {
+  position: absolute;
+  transform: translateY(100%);
+  opacity: 0;
+  scale: 2
+}
+.slide-du-leave-to {
+  position: absolute;
+  transform: translateY(-100%);
+  opacity: 0;
+  scale: 0.5
+}
+.col-trans {
+  display: flex;
+  flex-direction: column;
+}
   </style>

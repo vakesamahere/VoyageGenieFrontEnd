@@ -1,7 +1,7 @@
 <template>
   <div class="containerTest">
     <div class="subwin1">
-      <test :user_id="userId" @enterPost="handleEnterPost"/>
+      <SquarePage :user_id="userId" @enterPost="handleEnterPost" :searchKeyword="searchKeyword"/>
     </div>
     <el-dialog
                 v-model="dialogVisible"
@@ -17,52 +17,60 @@
   
   </div>
   </template>
-  
   <script lang="ts" setup>
   // import test from './components/TestRequest.vue'
-  import test from '../components/SquarePage.vue'
+  import SquarePage from '../components/SquarePage.vue'
 
   import PostDisplaying from '../../displayPost/PostDisplaying.vue';
   
   import { useStore } from 'vuex';
+  import { useRoute } from 'vue-router';
   import { ref, computed, watch,onUnmounted,onMounted } from 'vue';
 
+  const route = useRoute();
+  const searchKeyword = ref(route.query.keyword?.toString()||'')
   const dialogVisible = ref(false);
-const store = useStore();
-const userId = ref(store.state.userId);
-const dialogWidth = ref('60%'); // 默认宽度为60%
-let resizeListener = null;
+  const store = useStore();
+  const userId = ref(store.state.userId);
+  const dialogWidth = ref('60%'); // 默认宽度为60%
+  let resizeListener = null;
 
-// 使用getter获取userId
-const getUserId = computed(() => store.state.userId);
+  // 使用getter获取userId
+  const getUserId = computed(() => store.state.userId);
 
-// 监听userId变化
-watch(() => store.getters.getUserId, (newVal, oldVal) => {
- console.log(`User ID changed from ${oldVal} to ${newVal}`);
-// 执行其他需要的操作
-});
+  // 监听userId变化
+  watch(() => store.getters.getUserId, (newVal, oldVal) => {
+  console.log(`User ID changed from ${oldVal} to ${newVal}`);
+  // 执行其他需要的操作
+  });
 
-function handleEnterPost(){
-  dialogVisible.value = true;
-}
+  // 监听route变化
+  watch(() => route.query.keyword, (newVal, oldVal) => {
+    console.log(`keyword changed from ${oldVal} to ${newVal}`);
+    searchKeyword.value = newVal?.toString()||''
+  });
 
-onMounted(() => {
-  // 初始化时检查屏幕尺寸，并设置dialogWidth
-  checkScreenSize();
-  // 添加resize事件监听器
-  resizeListener = window.addEventListener('resize', checkScreenSize);
-});
-
-onUnmounted(() => {
-  if (resizeListener) {
-    window.removeEventListener('resize', resizeListener);
+  function handleEnterPost(){
+    dialogVisible.value = true;
   }
-});
 
-const checkScreenSize = () => {
-  const screenWidth = document.documentElement.clientWidth;
-  dialogWidth.value = screenWidth <= 768 ? '100%' : '60%';
-};
+  onMounted(() => {
+    // 初始化时检查屏幕尺寸，并设置dialogWidth
+    checkScreenSize();
+    // 添加resize事件监听器
+    resizeListener = window.addEventListener('resize', checkScreenSize);
+  });
+
+  onUnmounted(() => {
+    if (resizeListener) {
+      window.removeEventListener('resize', resizeListener);
+    }
+  });
+
+  const checkScreenSize = () => {
+    const screenWidth = document.documentElement.clientWidth;
+    dialogWidth.value = screenWidth <= 768 ? '100%' : '60%';
+  };
 
 
   </script>
@@ -79,8 +87,7 @@ const checkScreenSize = () => {
   .subwin1{
     height: 100vh;
     width: 100%;
-    z-index: 2000;
-    pointer-events: none;
+    /* pointer-events: none; */
   }
   .subwin2{
     height: 100vh;
@@ -89,6 +96,8 @@ const checkScreenSize = () => {
   .containerTest{
     display: flex;
     flex-direction: row;
+    height: 100vh;
+    width: 100vw;
   }
 
   .el-dialog{
