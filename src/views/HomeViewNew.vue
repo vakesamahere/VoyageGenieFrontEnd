@@ -14,49 +14,14 @@
               </div>
           </el-header>
           <el-container class="container" >
-          <el-header class="voyage">
-              <el-row>
-                <el-col :span="6" class="span">
-                  <el-button color="white" :class="{'common-button':!isAClick,'click-button':isAClick}" icon="EditPen" @click="handleAClick">
-                      <i class="custom-icon"></i>
-                      行程
-                  </el-button>
-                </el-col>
-              <!-- </el-row>
-              <el-row> -->
-                <el-col :span="6" class="span">
-                  <el-button color="white" :class="{'common-button':!isBClick,'click-button':isBClick}" icon="Pointer" @click="handleBClick">
-                      <i class="custom-icon"></i>
-                      点赞
-                  </el-button>
-                </el-col>
-              <!-- </el-row>
-              <el-row> -->
-                <el-col :span="6" class="span">
-                  <el-button color="white" :class="{'common-button':!isCClick,'click-button':isCClick}" icon="Star" @click="handleCClick">收藏
-                  </el-button>
-                </el-col>
-              <!-- </el-row>
-              <el-row> -->
-                <el-col :span="6" class="span">
-                  <el-button color="white" :class="{'common-button':!isDClick,'click-button':isDClick}" icon="Warning" @click="handleDClick">
-                      <i class="custom-icon"></i>
-                      关注
-                  </el-button>
-                </el-col>
-              </el-row>
-          </el-header>
-          <el-divider />
-          <el-main  class="main-content">
-                  <router-view/>
-          </el-main>
+            <MyPosts />
           </el-container>
-      </el-container>
+        </el-container>
   </div>
 </template>
 
 <script lang="ts" setup>
-
+  import MyPosts from '@/components/myposts.vue';
   import { useRouter } from 'vue-router';
   const router = useRouter();
   import {onMounted, ref,computed,watch} from 'vue'

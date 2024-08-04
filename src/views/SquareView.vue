@@ -1,7 +1,7 @@
 <template>
   <div class="containerTest">
     <div class="subwin1">
-      <SquarePage :user_id="userId" @enterPost="handleEnterPost" :searchKeyword="searchKeyword"/>
+      <SquarePage :user_id="userId" @enterPost="handleEnterPost" @searchChange="changeLastSearch"  :searchKeyword="searchKeyword"/>
     </div>
     <el-dialog
                 v-model="dialogVisible"
@@ -25,8 +25,14 @@
   
   import { useStore } from 'vuex';
   import { useRoute } from 'vue-router';
-  import { ref, computed, watch,onUnmounted,onMounted } from 'vue';
+  import { ref, computed, watch,onUnmounted,onMounted,defineEmits } from 'vue';
 
+  const emit = defineEmits<{
+      (e:'searchChange',keyword:string): void
+  }>();
+  function changeLastSearch(keyword:string) {
+    emit('searchChange',keyword);
+  }
   const route = useRoute();
   const searchKeyword = ref(route.query.keyword?.toString()||'')
   const dialogVisible = ref(false);
@@ -37,6 +43,7 @@
 
   // 使用getter获取userId
   const getUserId = computed(() => store.state.userId);
+  
 
   // 监听userId变化
   watch(() => store.getters.getUserId, (newVal, oldVal) => {
@@ -46,6 +53,9 @@
 
   // 监听route变化
   watch(() => route.query.keyword, (newVal, oldVal) => {
+    if(newVal===undefined){
+      return
+    }
     console.log(`keyword changed from ${oldVal} to ${newVal}`);
     searchKeyword.value = newVal?.toString()||''
   });

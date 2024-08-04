@@ -57,7 +57,7 @@
   
       <!-- start of subwin container -->
       <el-main class="main" :class="{'blur':isSearchVisible}">
-          <router-view :currentChat="currentChat" v-slot="{ Component }">
+          <router-view :currentChat="currentChat" @searchChange="changeLastSearch" v-slot="{ Component }">
             <transition :name="slideMode" mode="out-in">
               <keep-alive>
                 <component :is="Component"></component>
@@ -134,6 +134,10 @@ export default {
     }
   },
   methods: {
+    changeLastSearch(text) {
+      // alert(text)
+      this.lastSearchQuery=text
+    },
     handleSearchClick() {
       if(this.isSearchVisible){
         this.handleSearchClose()

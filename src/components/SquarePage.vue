@@ -64,6 +64,18 @@ export default {
                 // alert(this.searchKeyword)
                 this.handleSearch(this.searchKeyword)
             }
+        },
+        userId:{
+            handler(_,__){
+                // alert(this.searchKeyword)
+                this.handleSearch(this.searchKeyword)
+            }
+        }
+
+    },
+    computed: {
+        userId() {
+            return this.$store.state.userId
         }
     },
     methods:{
@@ -99,22 +111,34 @@ export default {
                 this.goToSquare(keyword,indexHistory)
             }
             //搜索
+            this.$emit('searchChange',keyword)
+                    
             
 
             if(keyword===''){
                 this.loadPosts()
                 return
             }
+            this.posts=[]
             console.log(keyword);
-            const res = await axios.get(`http://1.94.170.22:5000/search_posts?keyword=${keyword}`);
+            let query = `http://1.94.170.22:5000/search_posts?keyword=${keyword}`
+            if(this.$store.state.userId!==undefined && this.$store.state.userId!==null){
+                query+=`&user_id=${this.$store.state.userId}`
+            }
+            const res = await axios.get(query);
             console.log(res);
             setTimeout(() => {
                 this.posts=res.data
             }, 700);
         },
         async loadPosts(){
-            const res = await axios.get(`http://1.94.170.22:5000/get_recommended_posts`);
-            console.log(res);
+            this.posts=[]
+            let query = `http://1.94.170.22:5000/get_recommended_posts`
+            if(this.$store.state.userId!==undefined && this.$store.state.userId!==null){
+                query+=`?user_id=${this.$store.state.userId}`
+            }
+            const res = await axios.get(query);
+            console.log(res.data);
             setTimeout(() => {
                 this.posts=res.data
                 if(_test){

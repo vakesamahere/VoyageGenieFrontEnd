@@ -12,13 +12,32 @@
           >
               
               <el-menu-item
-                  v-for="(item, index) in searchHistory"
-                  :key="index"
                   :index="index"
-                  @click="goToSquare(item.content,index)"
+                  @click="loadMyPosts()"
                   class="search-item"
                   >
-                  {{ item.display }}
+                  Notes
+              </el-menu-item>
+              <el-menu-item
+                  :index="index"
+                  @click="loadMyLikes()"
+                  class="search-item"
+                  >
+                  Likes
+              </el-menu-item>
+              <el-menu-item
+                  :index="index"
+                  @click="loadMyCollections()"
+                  class="search-item"
+                  >
+                  Collections
+              </el-menu-item>
+              <el-menu-item
+                  :index="index"
+                  @click="loadMyInterests()"
+                  class="search-item"
+                  >
+                  Interests
               </el-menu-item>
           </el-menu>
       </div>
@@ -64,23 +83,39 @@ export default {
       }
   },
   methods:{
-      goToSquare(keyword,index) {
-          this.selectIndex=index
-          this.$router.push({
-              path: '/square',
-              query: {
-              keyword: keyword,
-              },
-          });
+      async clearPosts(){
+          this.posts=[]
       },
-      async loadPosts(){
-          const res = await axios.get(`http://1.94.170.22:5000/get_user_posts?user_id=${this.userId}&target_id=${this.userId}`);
+      async loadMyPosts(){
+        this.clearPosts();
+        const res = await axios.get(`http://1.94.170.22:5000/get_user_posts?user_id=${this.userId}&target_id=${this.userId}`);
+        console.log(res);
+        setTimeout(() => {
+            this.posts=res.data
+        }, 700);
+      },
+      async loadMyLikes(){
+        this.clearPosts();
+          const res = await axios.get(`http://1.94.170.22:5000/get_user_likes?user_id=${this.userId}&target_id=${this.userId}`);
           console.log(res);
           setTimeout(() => {
               this.posts=res.data
-              if(_test){
-                  this.posts = this.posts.concat(testCovers)
-              }
+          }, 700);
+      },
+      async loadMyCollections(){
+        this.clearPosts();
+          const res = await axios.get(`http://1.94.170.22:5000/get_user_collections?user_id=${this.userId}&target_id=${this.userId}`);
+          console.log(res);
+          setTimeout(() => {
+              this.posts=res.data
+          }, 700);
+      },
+      async loadMyInterests(){
+        this.clearPosts();
+          const res = await axios.get(`http://1.94.170.22:5000/get_user_subscribes_post?user_id=${this.userId}&target_id=${this.userId}`);
+          console.log(res);
+          setTimeout(() => {
+              this.posts=res.data
           }, 700);
       },
       handleEnterPost(item){
@@ -101,8 +136,7 @@ export default {
         }
         this.reranderV()
         this.vvkey+=1;
-        this.loadPosts();
-        alert('2');
+        // this.loadPosts();
       },
       async postAndcancel(id){
         try{
@@ -115,11 +149,11 @@ export default {
       }
       this.reranderV()
       this.vvkey+=1;
-      this.loadPosts();
+      // this.loadPosts();
       },
   },
   mounted(){
-      this.loadPosts()
+      // this.loadPosts()
       this.updateWindowSize()
       console.log(window.innerWidth);
       window.addEventListener('resize',this.updateWindowSize)

@@ -48,7 +48,6 @@
                 </div>
               </div>
               <div class="author-info">
-                <!-- <img class="card-profile" :src="slotProp.item.author.cover"> -->
                 <!-- start of author info -->
                 <el-popover
                   :title="slotProp.item.authorName"
@@ -79,6 +78,20 @@
         </div>
       </template>
   </v3-waterfall>
+  
+    <!-- start of loading icon -->
+    <transition name="loading-trans">
+       <div class="loading-block" v-show="loading">
+        <!-- loading -->
+        <div class="loader">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+       </div>
+     </transition>
+    <!-- end of loading icon -->
     </div>
   </template>
   
@@ -91,9 +104,17 @@
       list:[]
     },
     watch: {
-      list(oldValue,newValue){
+      list(newValue,oldValue){
         this.localList=[]
+        this.vvkey+=1;
         this.localList=this.nextChunk
+        if(newValue.length!==0){
+          //end of loading
+          this.loading=false
+        }else{
+          //start of loading
+          this.loading=true
+        }
       }
     },
     data(){
@@ -166,11 +187,11 @@
         })
       },
       getButtonType(bit) {
-        console.log(bit)
+        // console.log(bit)
         return (bit === 0) || (bit ===undefined) ? false : true;
       },
       cli(item){
-        console.log(item);
+        // console.log(item);
         this.$emit('enterPost',item)
       },
       displayMore(){
@@ -178,7 +199,7 @@
       },
       verifyRerander(v){
         setTimeout(() => {
-          console.log(v,this.vkey);
+          // console.log(v,this.vkey);
           if(this.vkey==v){
             this.vvkey+=1;
           }
@@ -358,6 +379,7 @@
     flex-shrink: 0;
     scale: 1.1;
     opacity: 0.9;
+    cursor: pointer;
   }
 
   
@@ -380,5 +402,131 @@
 .col-trans {
   display: flex;
   flex-direction: column;
+}
+.loading-block {
+  font-size: 10vh;
+  position: absolute;
+  top: 50%;
+  left: 56.25%; /*侧栏占15%时，15%+85%/2 */
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.loading-trans-enter-active, .loading-trans-leave-active {
+  transition: all 0.4s ease-in-out
+}
+.loading-trans-enter-from {
+  /* transform: translateX(-150%) translateY(-50%); */
+  opacity: 0;
+}
+.loading-trans-leave-to {
+  /* transform: translateX(50%) translateY(-50%); */
+  opacity: 0;
+}
+
+.loading-block * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.loading-block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: transparent;
+  z-index: 100;
+}
+.loader {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  -webkit-box-reflect: below 1px linear-gradient(transparent, #0005);
+}
+.loader:hover {
+  background-color: var(--color-light);
+  box-shadow: 0 0 5px var(--color-light),
+              0 0 25px var(--color-light),
+              0 0 25px var(--color-light),
+              0 0 200px var(--color-light);
+}
+.loader span {
+  position: absolute;
+  display: block;
+}
+.loader span:nth-child(1){
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(90deg,transparent,var(--color-light));
+  animation: animate1 1s linear infinite;
+  animation-delay: 0s;
+}
+@keyframes animate1 {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left:  100%;
+  }
+}
+
+.loader span:nth-child(3){
+  bottom: 0;
+  left: -100%;
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(270deg,transparent,var(--color-light));
+  animation: animate3 1s linear infinite;
+  animation-delay: 0s;
+}
+@keyframes animate3 {
+  0% {
+    left: 100%;
+  }
+  100% {
+    left: -100%;
+  }
+}
+ 
+.loader span:nth-child(2){
+  right: 0;
+  top: -100%;
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(180deg,transparent,var(--color-light));
+  animation: animate2 1s linear infinite;
+  animation-delay: 0.5s;
+}
+@keyframes animate2 {
+  0% {
+    top: -100%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+ 
+.loader span:nth-child(4){
+  left: 0;
+  top: -100%;
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(0deg,transparent,var(--color-light));
+  animation: animate4 1s linear infinite;
+  animation-delay: 0.5s;
+}
+@keyframes animate4 {
+  0% {
+    top: 100%;
+  }
+  100% {
+    top: -100%;
+  }
+}
+
+.waterfall{
+  min-height: 100vh;
 }
   </style>
