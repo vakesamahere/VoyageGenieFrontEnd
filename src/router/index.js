@@ -18,13 +18,20 @@ const router = createRouter({
       } 
     },
     {
-      path: '/:chatId', // 使用id作为动态路由参数
+      path: '/chat', // 使用id作为动态路由参数
       name: 'chat',
       component: () => import('../components/Planner.vue'),
       meta: { 
         requiresAuth: true,
         index:2
-      } 
+      },
+      children: [
+        {
+          path: ':chatId',
+          name: 'chatdetail',
+          component: () => import('../components/ChatBox.vue')
+        },
+      ]
     },
     {
       path: '/square',
@@ -76,17 +83,17 @@ const router = createRouter({
           component: () => import('../components/interest.vue')
         },
         {
-          path: '/journey',
+          path: 'journey',
           name:'journey',
           component:() => import('../components/journey.vue')
         },
         {
-          path: '/collection',
+          path: 'collection',
           name:'collection',
           component:() => import('../components/collection.vue')
         },
         {
-          path: '/like',
+          path: 'like',
           name:'like',
           component:() => import('../components/like.vue')
         },

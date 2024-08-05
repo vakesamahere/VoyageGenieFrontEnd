@@ -133,6 +133,7 @@ export default {
   methods: {
     handleLike() {
         console.log('like');
+        alert(this.userId)
         axios.post('http://1.94.170.22:5000/toggle_like',{
             "post_id":this.postId,
             "user_id":this.userId
@@ -205,6 +206,8 @@ export default {
   },
   mounted() {
     //
+    //alert(this.postId)
+    alert("in"+this.userId)
     this.getPostContent();
   },
   computed:{
@@ -312,7 +315,7 @@ export default {
     scale: 1.005;
 }
 
-.container > # {
+.container  {
     /*
     text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff;
     */

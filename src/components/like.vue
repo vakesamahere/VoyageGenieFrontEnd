@@ -39,6 +39,8 @@
   
   <script>
   import axios from 'axios';
+  import { ref, computed, watch } from 'vue';
+  import { useStore } from 'vuex';
   export default{
     props:{
       msg:String,
@@ -114,6 +116,7 @@
       async Getposts(){
         try{
           const response=await axios.get('http://1.94.170.22:5000/get_user_likes?user_id='+this.userId);
+          console.log('http://1.94.170.22:5000/get_user_likes?user_id='+this.userId)
           this.list=response.data;
         }catch(error){
           console.error('There was an error fetching the data!', error);

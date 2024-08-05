@@ -234,6 +234,8 @@ export default {
     margin: 0 0 0 0;
     background-color: "#545c64";
 }
+
+
 </style>
 
 <style scoped>

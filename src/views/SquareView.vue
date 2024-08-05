@@ -7,10 +7,10 @@
                 v-model="dialogVisible"
                 :width="dialogWidth"
                 align-center
-
+                destroyOnClose="true"
                 >
                   <span>
-                    <PostDisplaying :user_id="userId" :postId="1"/>
+                    <PostDisplaying :userId="userId" :postId="postId"/>
                   </span>
 
               </el-dialog>
@@ -45,6 +45,11 @@
   const getUserId = computed(() => store.state.userId);
   
 
+function handleEnterPost(id){
+  alert(userId.value)
+  postId.value = id;
+  dialogVisible.value = true;
+}
   // 监听userId变化
   watch(() => store.getters.getUserId, (newVal, oldVal) => {
   console.log(`User ID changed from ${oldVal} to ${newVal}`);
