@@ -5,7 +5,21 @@
           <el-row>
             <el-col :span="1"></el-col>
             <el-col :span="21"><span>编辑资料</span></el-col>
-            <el-col :span="2" class="avatar"> <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" :size="50"/></el-col>
+            <el-col :span="2" class="avatar">
+              <div v-if="!isUploadEnabled" class="avatar-uploader">
+                <img :src="defaultImage" class="avatar" />
+              </div>
+            <el-upload
+              v-else
+              class="avatar-uploader"
+              :show-file-list="false"
+              :on-change="handleFileChange"
+              :before-upload="beforeAvatarUpload"
+            >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            </el-upload>
+              </el-col>
           </el-row>
       </el-header>
       <el-main class="main">
@@ -56,6 +70,9 @@
 </template>
 
 <script lang="ts" setup>
+  import { ElMessage, ElButton } from 'element-plus'
+  import { Plus } from '@element-plus/icons-vue'
+  import type { UploadProps } from 'element-plus'
   import axios from 'axios';
 import { ElNotification } from 'element-plus';
   import { onMounted, ref,computed,watch } from 'vue'
@@ -69,11 +86,22 @@ import { ElNotification } from 'element-plus';
   const response=ref();
   const tele=ref();
   const birth=ref();
+  const isUploadEnabled = ref(false)
+  const cover=ref();
 
   import { useStore } from 'vuex';
 
 const store = useStore();
 const userId = ref(store.state.userId);
+const defaultImage = ref('')  // 替换成你的Base64图片
+  
+  const imageUrl = ref('')
+  
+  // 启用上传功能
+  const enableUpload = () => {
+    isUploadEnabled.value = true
+    imageUrl.value = defaultImage.value;
+  }
 
 // 使用getter获取userId
 const getUserId = computed(() => store.state.userId);
@@ -83,8 +111,32 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
  console.log(`User ID changed from ${oldVal} to ${newVal}`);
       // 执行其他需要的操作
  });
-
-
+ const handleFileChange: UploadProps['onChange'] = (file) => {
+    const reader = new FileReader()
+    reader.onload = async (e) => {
+      const base64String = e.target?.result as string
+      imageUrl.value = base64String
+  
+      try {
+        cover.value=imageUrl.value;
+        ElMessage.success('Avatar uploaded successfully!')
+      } catch (error) {
+        ElMessage.error('Failed to upload avatar')
+      }
+    }
+    reader.readAsDataURL(file.raw!)
+  }
+  
+  const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+    if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+      ElMessage.error('Avatar picture must be JPG or PNG format!')
+      return false
+    } else if (rawFile.size / 1024 / 1024 > 2) {
+      ElMessage.error('Avatar picture size cannot exceed 2MB!')
+      return false
+    }
+    return true
+  }
   const show=async ()=>{
       try{
           const res=await axios.get(`http://1.94.170.22:5000/get_user_profile?user_id=${userId.value}`);
@@ -92,9 +144,11 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
           email.value=response.value.email;
           password.value=response.value.password;
           bio.value=JSON.parse(response.value.info).bio;
+          cover.value=JSON.parse(response.value.info).cover;
           name.value=response.value.name;
           tele.value=response.value.tele;
           birth.value=response.value.birth;
+          defaultImage.value=cover.value;
       }catch(error:any){
           console.error('There was an error fetching the data!',error);
       }
@@ -108,7 +162,7 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
     showA.value = true;
     showBAndC.value = false;
     try{
-      const info=ref(JSON.stringify({"bio":bio.value}));
+      const info=ref(JSON.stringify({"bio":bio.value,"cover":cover.value}));
       const data=ref({"user_id":userId.value,"email":email.value,"name":name.value,"tele":tele.value,"info":info.value})
       console.log(data.value);
       const res=await axios.post('http://1.94.170.22:5000/update_user_profile', data.value);
@@ -136,6 +190,7 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
         offset:200
       })
     }
+    isUploadEnabled.value = false;
     show();
   };
   const cancel = () => {
@@ -143,6 +198,7 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
     showA.value = true;
     showBAndC.value = false;
     show();
+    isUploadEnabled.value = false;
   };
 
   // 切换输入框状态的函数
@@ -150,6 +206,8 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
     isDisabled.value = !isDisabled.value;
     showA.value = false;
     showBAndC.value = true;
+    isUploadEnabled.value = true;
+    imageUrl.value = defaultImage.value;
   };
  
 </script>
@@ -186,7 +244,7 @@ padding-left: 60px; /* 设置输入内容距离左边框 200px */
 }
 .tag{
   font-size: 20px;
-  padding-left: 10%;
+  padding-left: 9%;
   display: flex;
   justify-content: flex-start;
   font-weight: bold;
@@ -218,5 +276,37 @@ align-items: center;
 }
 ::-webkit-scrollbar{
   display: none;
+}
+.avatar-uploader {
+    border: 1px dashed var(--el-border-color);
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--el-transition-duration-fast);
+    width: 50px;
+    height: 50px;
+  }
+  
+  .avatar-uploader:hover {
+    border-color: var(--el-color-primary);
+  }
+  
+  .el-icon.avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+  }
+</style>
+
+<style scoped>
+.avatar-uploader .avatar {
+  width: 50px;
+  height: 50px;
+  display: block;
+  border-radius: 50%;
 }
 </style>
