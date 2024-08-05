@@ -13,12 +13,11 @@
             <el-dialog
               v-model="dialogVisible"
               :width="dialogWidth"
-              :height="dialogHeight"
               :before-close="handleClose"
               align-center
               >
                 <span>
-                  <iframe class="iframe-post" name="postbox" :src="`/static/a.html?data=${trans(textList2)}`" width="100%" height="100%"></iframe> 
+                  <PostBox v-if="post" :post="post"></PostBox>                
                 </span>
                 <template #footer>
                     <div class="dialog-footer">
@@ -47,7 +46,7 @@
             <!-- 输入框绑定 v-model 以获取用户输入 -->
             <!-- 按钮点击时触发 addTextDiv 方法 -->
             <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;">发送</el-button>
-            <el-button @click="dialogVisible=true;" style="margin-top: 60px;">预览</el-button>
+            <el-button @click="dialogVisible=true;post=JSON.parse(textList2)" style="margin-top: 60px;">预览</el-button>
            
           </div>
         </el-footer>
@@ -58,7 +57,7 @@
 <script lang="ts" setup>
   import { watch,ref,defineProps, onMounted,onUnmounted } from 'vue'
   import ChatBox from './ChatBox.vue';
-  import PostBox from './NewPostBox.vue';
+  import PostBox from './PostBox.vue';
   import axios from 'axios'; // 导入 axios 用于发送 HTTP 请求
   
   
@@ -73,8 +72,8 @@
   const index1 = ref(0);
   const index2 = ref(0);
   let resizeListener = null;
-  const dialogWidth = ref('80%');
-  const dialogHeight = ref('70%');
+  const dialogWidth = ref('60%');
+  const dialogHeight = ref('100%');
   const props = defineProps({
     currentChat: Object,
   });
@@ -411,6 +410,7 @@ routes: [
 import { ElMessageBox } from 'element-plus'
 import SendPost from '@/SendPost.vue';
 import { k } from 'vite/dist/node/types.d-aGj9QkWt';
+import { parse } from 'vue/compiler-sfc';
 
 const handleClose = (done: () => void) => {
   console.log(dialogWidth.value)

@@ -16,7 +16,7 @@
     <el-tab-pane
       v-for="(route,index) in post.routes"
       :key="index"
-      :label="route.name"
+      :label="'Day'+(index+1)"
 
       :name= "route.name"
     >
@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref } from 'vue';
+import { defineProps, onMounted, ref } from 'vue';
 
 // 定义 props 并使用 TypeScript 进行类型注解
 interface Post {
@@ -95,6 +95,8 @@ const props = defineProps<{
 
 // 使用解构赋值从 props 中获取 post 数据
 const { post } = props;
+
+
 
 import type { TabPaneName } from 'element-plus'
 
