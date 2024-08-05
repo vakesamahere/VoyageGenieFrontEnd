@@ -1,5 +1,4 @@
 <template>
-   <iframe class="iframe-post" name="postbox" :src="`static/a.html?data=${trans(JSON.parse(textList2).routes)}`" width="100%" height="100%"></iframe>
   <el-container>
       <el-main >
         <el-scrollbar style="max-height: 100%;">
@@ -14,11 +13,12 @@
             <el-dialog
               v-model="dialogVisible"
               :width="dialogWidth"
+              :height="dialogHeight"
               :before-close="handleClose"
               align-center
               >
                 <span>
-                 
+                  <iframe class="iframe-post" name="postbox" :src="`/static/a.html?data=${trans(textList2)}`" width="100%" height="100%"></iframe> 
                 </span>
                 <template #footer>
                     <div class="dialog-footer">
@@ -47,7 +47,7 @@
             <!-- 输入框绑定 v-model 以获取用户输入 -->
             <!-- 按钮点击时触发 addTextDiv 方法 -->
             <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;">发送</el-button>
-            <el-button @click="dialogVisible=true;console.log(textList2[0])" style="margin-top: 60px;">预览</el-button>
+            <el-button @click="dialogVisible=true;" style="margin-top: 60px;">预览</el-button>
            
           </div>
         </el-footer>
@@ -66,14 +66,15 @@
   const dialogVisible = ref(false)
   const inputText = ref('')
   const textList1 = ref([]); // 存储输入文本的列表，用于生成 div
-  const textList2 = ref(''); // 存储输入文本的列表，用于生成 div
+  const textList2 = ref(''); // 存储输入事件的列表，用于生成 div
   const listName = ref('1'); // 初始化 listName,用于区分列表
   const isdisable = ref(false);//按钮禁用状态
   const activeName = ref('1'); // 初始化 activeName
   const index1 = ref(0);
   const index2 = ref(0);
   let resizeListener = null;
-  const dialogWidth = ref('60%'); // 默认宽度为60%
+  const dialogWidth = ref('80%');
+  const dialogHeight = ref('70%');
   const props = defineProps({
     currentChat: Object,
   });
@@ -81,16 +82,25 @@
   
   const textList = ref([]);
 
-function trans(routes){
- return encodeURIComponent(JSON.stringify(JSON.parse(routes).flatMap(route => 
- route.events.map(event => ({
- place: '',
- title: event.name,
- title2: '',
- description: event.description,
- image: event.images[0] || ''
- }))
- )));
+function trans(tl2){
+  // tl2 = textList2 -> string of json
+  // need to get the routes:string of json(list)
+  if(tl2===''){
+    return encodeURIComponent('[]')
+  }
+  const j = JSON.parse(tl2)
+  if(!j.routes){
+    return encodeURIComponent('[]')
+  }
+  return encodeURIComponent(JSON.stringify(j.routes.flatMap(route => 
+  route.events.map(event => ({
+  place: '',
+  title: event.name,
+  title2: '',
+  description: event.description,
+  image: event.images[0] || ''
+  }))
+  )));
 }
 
 
@@ -115,14 +125,18 @@ function updateTextList() {
 if (props.currentChat && props.currentChat.history) {
   try {
     // 假设currentChat.history是一个JSON格式的字符串
-    textList.value = JSON.parse(props.currentChat.history).messages;
+    if(props.currentChat.history){
+      textList.value = JSON.parse(props.currentChat.history).messages;
+    }else{
+      textList.value = []
+    }
     textList2.value = props.currentChat.agentMemory;
     console.log('更新:'+textList.value[0].from);
   } catch (error) {
     console.error('Error parsing currentChat.history:', error);
     // 可以设置一个错误状态或者进行其他错误处理
     textList.value = [];
-    textList2.value = [];
+    textList2.value = "";
   }
 }
 
@@ -131,33 +145,32 @@ if (props.currentChat && props.currentChat.history) {
 onMounted(updateTextList);
 // 监听currentChat的变化，当它变化时更新textList
 watch(() => props.currentChat, (newVal, oldVal) => {
-// 这里可以添加逻辑来处理currentChat变化时需要执行的操作
-// 例如，如果只需要在currentChat.history变化时才更新textList
-if (newVal.history !== oldVal.history) {
-  updateTextList();
-  console.log('再更新:'+textList.value);
-}
+  // 这里可以添加逻辑来处理currentChat变化时需要执行的操作
+  // 例如，如果只需要在currentChat.history变化时才更新textList
+  if (!oldVal || newVal.history !== oldVal.history) {
+    updateTextList();
+    console.log('再更新:'+textList.value);
+  }
 });
  
   
 // 定义保存帖子的方法
 const saveChatContent = async () => {
-console.log('保存聊天内容:', "{\"messages\": \""+JSON.stringify(textList.value)+"\"}");
-try {
-  const response = await axios.post(`${API_URL}/save_chat_content`, {
-    chat_id: props.currentChat.uid,
-    history: JSON.stringify({messages:  textList.value}),
-    agentMemory:  JSON.stringify(textList2.value),
-  });
-  if (response.data.status === "success") {
-    console.log("Chat content saved successfully.");
-  } else {
-    console.error("Failed to save chat content.");
+  console.log('保存聊天内容:', "{\"messages\": \""+JSON.stringify(textList.value)+"\"}");
+  try {
+    const response = await axios.post(`${API_URL}/save_chat_content`, {
+      chat_id: props.currentChat.uid,
+      history: JSON.stringify({messages:  textList.value}),
+      agentMemory:  textList2.value,
+    });
+    if (response.data.status === "success") {
+      console.log("Chat content saved successfully.");
+    } else {
+      console.error("Failed to save chat content.");
+    }
+  } catch (error) {
+    console.error("Error saving chat content:", error);
   }
-} catch (error) {
-  console.error("Error saving chat content:", error);
-}
-
 };
   
 interface Post {
@@ -397,6 +410,7 @@ routes: [
 
 import { ElMessageBox } from 'element-plus'
 import SendPost from '@/SendPost.vue';
+import { k } from 'vite/dist/node/types.d-aGj9QkWt';
 
 const handleClose = (done: () => void) => {
   console.log(dialogWidth.value)

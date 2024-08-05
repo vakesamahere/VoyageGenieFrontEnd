@@ -43,7 +43,7 @@
         <el-icon  style="font-size: 80px;margin-top: -20px;z-index: 1000;color:rgb(255,194,151); 
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);border-radius: 50%;  
         background-image: radial-gradient(circle at 50% 50%, #fff, #fad0c4); "
-        @click="createChatSession()">
+        @click="createChatSession">
           <CirclePlusFilled /></el-icon>
         </el-footer>
       </el-aside>
@@ -103,14 +103,14 @@
   checkScreenSize();
   // 添加resize事件监听器
   resizeListener = window.addEventListener('resize', checkScreenSize);
-  loadAllChat(userId.value);
+  loadAllChat(store.state.userId);
 });
 
 //新建chat
 async function createChatSession() {
   try {
     const response = await axios.post(`${API_URL}/create_chat`, {
-      user_id: userId.value, // 假设的用户ID
+      user_id: store.state.userId, // 假设的用户ID
       history: "{}",
       agentMemory: "{}",
     });
@@ -123,7 +123,7 @@ async function createChatSession() {
     switchChat(newChatSession.uid);
     const chatUid = response.data.chat_uid;
     console.log('新建聊天的 UID:', chatUid);
-    loadAllChat(userId.value);
+    loadAllChat(store.state.userId);
   } catch (error) {
     console.error('创建聊天会话失败:', error);
   }
@@ -155,7 +155,7 @@ const deleteChat = async (uid) => {
     const response = await axios.post(`${API_URL}/delete_chat`,{chat_id:uid});
     // 处理成功情况，例如从列表中删除聊天
     chats.value = chats.value.filter(chat => chat.uid !== uid);
-    loadAllChat(userId.value);
+    loadAllChat(store.state.userId);
   } catch (error) {
     // 处理错误情况
     console.error('Delete chat failed:', error);
