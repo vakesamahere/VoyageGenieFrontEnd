@@ -131,7 +131,8 @@ export default{
   props:{
     msg:String,
     list:[],
-    editable:false
+    editable:false,
+    trigger:0,
   },
   components:{
     PostDisplaying
@@ -157,6 +158,11 @@ export default{
         this.isPostDisplaying=false
       },
       // immediate:true
+    },
+    trigger:{
+      handler(_,__){
+        this.loading=false
+      }
     }
   },
   data(){
@@ -309,7 +315,7 @@ export default{
     handleEscKey(event) {
       if (event.key === 'Escape') {
         this.isPostDisplaying=false;
-        this.isLoading=false;
+        this.loading=false;
       }
     },
   },

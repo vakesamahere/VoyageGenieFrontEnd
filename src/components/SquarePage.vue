@@ -23,7 +23,7 @@
             </el-menu>
         </div>
         <div class="waterfall-container">
-            <waterfall v-if="wfDisplay" class="waterfall" :list="posts" @enterPost="handleEnterPost"></waterfall>
+            <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :trigger="wfTrigger" @enterPost="handleEnterPost"></waterfall>
         </div>
     </div>
 </template>
@@ -55,7 +55,8 @@ export default {
                     "content":""
                 }
             ],
-            selectIndex:0
+            selectIndex:0,
+            wfTrigger:0
         }
     },
     watch:{
@@ -79,6 +80,11 @@ export default {
         }
     },
     methods:{
+        ifEmpty(){
+            if(this.posts.length===0){
+                this.wfTrigger+=1
+            }
+        },
         goToSquare(keyword,index) {
             this.selectIndex=index
             this.$router.push({
@@ -129,6 +135,7 @@ export default {
             console.log(res);
             setTimeout(() => {
                 this.posts=res.data
+                this.ifEmpty()
             }, 700);
         },
         async loadPosts(){
@@ -144,6 +151,7 @@ export default {
                 if(_test){
                     this.posts = this.posts.concat(testCovers)
                 }
+                this.ifEmpty()
             }, 700);
         },
         handleEnterPost(item){
