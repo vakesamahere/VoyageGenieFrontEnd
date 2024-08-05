@@ -1,5 +1,5 @@
 <template>
-    <postBlock :post="post" @click="handleCommentHide"></postBlock>
+    <postBlock :post="post" @click="handleCommentHide" class="post-block"></postBlock>
 
     <div id="rightBar" class="rightBar">
         <div class="authorAvatar">
@@ -25,6 +25,7 @@
             </commentBlock>
         </div>
     </transition>
+    <div class="click-block" @click="closeSelf"></div>
 </template>
 
 <script lang="ts" setup>
@@ -45,12 +46,12 @@ export default {
   props: {
     postId:{
         type: Number,
-        default: ()=>(1)
+        default: ()=>(-1)
     },
-    userId:{
-        type: Number,
-        default: ()=>(1)
-    }
+    // userId:{
+    //     type: Number,
+    //     default: ()=>(1)
+    // }
   },
   data(){
     return {
@@ -168,6 +169,9 @@ export default {
         this.showCommentBlock=false;
         document.getElementById('commentBlock')?.classList.remove('commentBlockDisplay')
     },
+    closeSelf(){
+        this.$emit('closeSelf')
+    },
     async handleCommentSend(commentString:string,commentId:number,reply:boolean) {
         console.log('comment hide');
         console.log(commentString);
@@ -204,6 +208,9 @@ export default {
     this.getPostContent();
   },
   computed:{
+    userId() {
+        return this.$store.state.userId
+    },
     commentTransition() {
         return this.showCommentBlock?'slide-ud':'slide-du'
     },
@@ -230,6 +237,33 @@ export default {
             return ""
         }
         return info.cover
+    },
+    postRoutes(){
+        return JSON.parse(this.post.routes).map(route => 
+            route.events.map(event => ({
+            place: '',
+            title: event.name,
+            title2: '',
+            description: event.description,
+            image: event.images[0] || ''
+            }))
+        );
+    },
+    postText(){
+        return this.post.text
+    },
+    postTitle(){
+        return this.post.title
+    },
+  },
+  watch:{
+    postId:{
+        handler(newv,_){
+            if(newv>0){
+                this.getPostContent();
+            }
+        },
+        immediate:true
     }
   }
 };
@@ -441,7 +475,7 @@ export default {
     position:absolute;
     /* top: 120vh; */
     top:29%;
-    left: 5vh;
+    left: 5%;
     transition: top 0.3s ease-in-out;
     background-color: #eeeeee;
     filter: drop-shadow(0 0 10px black);
@@ -465,12 +499,13 @@ export default {
     right: 0.5vw;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1;
+    z-index: 11;
 }
 .rightBarButton {
     padding-top: 1vh;
     padding-bottom: 1vh;
     scale: 1.2;
+    z-index:11;
 }
 
 .slide-du-enter-active, .slide-du-leave-active {
@@ -491,6 +526,28 @@ export default {
 }
 .slide-ud-leave-to {
   transform: translateY(-100vh);
+}
+
+.post-block {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    height: 80vh;
+    width: 80vw;
+    filter: drop-shadow(0 0 15px var(--color-light));
+    border-radius: 20px;
+    z-index: 6;
+}
+
+.click-block {
+    position: absolute;
+    top:0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: 5;
+    /* background-color: pink; */
 }
 
 </style>

@@ -22,7 +22,7 @@ class="waterfall"
       <div class="list-item">
         <!-- <a href="#" @click="cli(slotProp.item)"> -->
           <div class="cover-wrapper" @click="cli(slotProp.item)">
-            <img v-if="slotProp.item.cover" :src="slotProp.item.cover" data-key="cover" class="cover" />
+            <img v-if="slotProp.item.cover" :src="slotProp.item.cover" data-key="cover" class="cover"/>
           </div>
           <div class="brief">
 
@@ -114,16 +114,27 @@ class="waterfall"
    </transition>
   <!-- end of loading icon -->
   </div>
+  <!-- start of post-displaying -->
+  <transition name="trans-post">
+    <div v-if="isPostDisplaying" class="post-display-box">
+      <PostDisplaying :postId="postDisplayingId" class="post-display" @closeSelf="isPostDisplaying=false" />
+    </div>
+  </transition>
+  <!-- end of post-displaying -->
 </template>
 
 <script>
 import axios from 'axios';
 import { Pointer, Star } from '@element-plus/icons-vue';
+import PostDisplaying from '../../displayPost/PostDisplaying.vue';
 export default{
   props:{
     msg:String,
     list:[],
     editable:false
+  },
+  components:{
+    PostDisplaying
   },
   watch: {
     list(newValue,oldValue){
@@ -154,7 +165,9 @@ export default{
       vkey:0,
       vvkey:0,
       gapRatio:0.01,
-      localList:[]
+      localList:[],
+      isPostDisplaying:false,
+      postDisplayingId:0
     }
   },
   computed:{
@@ -238,7 +251,10 @@ export default{
     },
     cli(item){
       // console.log(item);
-      this.$emit('enterPost',item)
+      // this.$emit('enterPost',item)
+      this.postDisplayingId = item.uid; 
+      this.isPostDisplaying=true;
+      // alert(this.isPostDisplaying)
     },
     displayMore(){
       this.localList=this.localList.concat(this.nextChunk)
@@ -279,10 +295,18 @@ export default{
     },
     goUserInfo(authorId){
       this.$emit('goUserInfo',authorId)
-    }
+    },
+    handleEscKey(event) {
+      if (event.key === 'Escape') {
+        this.isPostDisplaying=false;
+        this.isLoading=false;
+      }
+    },
   },
   mounted(){
     window.addEventListener('resize',this.reranderV);
+    window.addEventListener('keydown',this.handleEscKey);
+
     setTimeout(() => {
       this.localList=[]
       const n = this.nOfCol
@@ -291,6 +315,9 @@ export default{
       this.vvkey+=1;
     }, 100);
     this.autoRefresh()
+  },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleEscKey);
   }
 };
 </script>
@@ -469,6 +496,18 @@ opacity: 0;
 opacity: 0;
 }
 
+.trans-post-enter-active, .trans-post-leave-active {
+transition: all 0.2s ease-in-out
+}
+.trans-post-enter-from {
+/* transform: translateX(-150%) translateY(-50%); */
+opacity: 0;
+}
+.trans-post-leave-to {
+/* transform: translateX(50%) translateY(-50%); */
+opacity: 0;
+}
+
 .loading-block * {
 margin: 0;
 padding: 0;
@@ -574,5 +613,7 @@ animation-delay: 0.5s;
 
 .waterfall{
 min-height: 100vh;
+}
+.post-display-box {
 }
 </style>
