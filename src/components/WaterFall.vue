@@ -150,6 +150,13 @@ export default{
         this.loading=true
         this.$emit('loadingChange',true)
       }
+    },
+    router:{
+      handler(_,__){
+        alert(1)
+        this.isPostDisplaying=false
+      },
+      // immediate:true
     }
   },
   data(){
@@ -197,6 +204,9 @@ export default{
     },
     widthOfGap(){
       return this.containerWidth*this.gapRatio
+    },
+    router(){
+      return this.$store.state.router
     }
   },
   methods:{

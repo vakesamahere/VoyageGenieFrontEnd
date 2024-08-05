@@ -44,8 +44,6 @@
   // 使用getter获取userId
   const getUserId = computed(() => store.state.userId);
   
-
-// //function handleEnterPost(id){
 //   alert(userId.value)
 //   postId.value = id;
 //   dialogVisible.value = true;
