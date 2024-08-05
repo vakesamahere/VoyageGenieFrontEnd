@@ -37,6 +37,7 @@
   
   <script lang="ts" setup>
     import axios from 'axios';
+import { ElNotification } from 'element-plus';
     import { ref,defineEmits } from 'vue';
     const emit = defineEmits(['cancel','register'])
     const email = ref('');
@@ -54,15 +55,36 @@
       console.log(data.value.name);
       response.value=res.data;
       if(response.value.result==0){
-      alert('该邮箱已被注册账号');
+      // alert('该邮箱已被注册账号');
+      ElNotification({
+        title:'Oh No',
+        type:'error',
+        message:'该邮箱已被注册账号',
+        duration:1500,
+        offset:200
+      })
     }
     else{
-      alert('注册成功');
+      // alert('注册成功');
+      ElNotification({
+        title:'Success',
+        type:'success',
+        message:'注册成功',
+        duration:1500,
+        offset:200
+      })
     }
     }catch(error:any){
       console.error('There was an error sending the data!', error);
       response.value = { result: error.message };
-      alert('密码长度至少8位，需要同时包含数字和字母');
+      // alert('密码长度至少8位，需要同时包含数字和字母');
+      ElNotification({
+        title:'Oh No',
+        type:'error',
+        message:'邮箱或密码格式有误...密码长度至少8位，需要同时包含数字和字母',
+        duration:4500,
+        offset:200
+      })
     }
     
     };

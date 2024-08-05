@@ -31,6 +31,7 @@
 
 <script lang="ts" setup>
   import axios from 'axios';
+import { ElNotification } from 'element-plus';
   import { ref,reactive,defineEmits } from 'vue';
   import { useStore } from 'vuex';
   const store = useStore();
@@ -49,21 +50,44 @@ const handleSubmit = () => {
   
 const handleLogin = async () => {
     let resUserId = null;
+    let resUserAvatar = "";
+    let resUserName = "";
+    let resUserBio = "";
     try{
       const res=await axios.post('http://1.94.170.22:5000/login', data.value);
       response.value=res.data;
       console.log(res.data.user_id);
       resUserId = res.data.user_id
+      resUserName = res.data.name
+      resUserAvatar = JSON.parse(res.data.info).cover
+      resUserBio = JSON.parse(res.data.info).bio
     }catch(error:any){
       console.error('There was an error sending the data!', error);
       response.value = { result: error.message };
     }
     if(response.value.result==0){
-      alert('登录失败！未查询到邮箱或密码错误，请重新输入。');
+      // alert('登录失败！未查询到邮箱或密码错误，请重新输入。');
+      ElNotification({
+        title:'Oh No',
+        type:'error',
+        message:'登录失败...未查询到邮箱或密码错误，请重新输入。',
+        duration:2500,
+        offset:200
+      })
     }
     else{
-      alert('登录成功');
+      // alert('登录成功');
+      ElNotification({
+        title:'Login Success',
+        type:'success',
+        message:'登录成功',
+        duration:1500,
+        offset:200
+      })
       setUserId(resUserId);
+      store.commit('setUserAvatar',resUserAvatar)
+      store.commit('setUserName',resUserName)
+      store.commit('setUserBio',resUserBio)
       emit('login');
     }
 };

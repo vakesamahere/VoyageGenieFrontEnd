@@ -1,12 +1,5 @@
 <template>
     <div class="inputboxes-container">
-        <select v-model="selectedCity" class="select-box" v-if="false">
-            <option value="">选择城市</option>
-            <option v-for="city in cities" :key="city" :value="city">
-            {{ city }}
-            </option>
-        </select>
-
         <div class="search-box">
         <el-input
             type="text"

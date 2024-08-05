@@ -28,5 +28,22 @@ app.use(ElementPlus, { size: 'small', zIndex: 3000 })
 
 app.mount('#app')
 
+// 定义CSS变量
+const cssVariables = {
+  '--color-light': 'rgb(255, 128, 0)',
+  // '--color-light': '#ff6fb4',
+  '--bg-color': '#111',
+  '--display-text-color': '#bbb',
+  '--display-text-color-active': 'orange',
+  // '--display-text-color-active': '#ff6fb4',
+};
+
+// 将CSS变量注入到:root伪类选择器中
+Object.keys(cssVariables).forEach((key) => {
+  document.documentElement.style.setProperty(key, cssVariables[key]);
+});
+
 const _test = true
-export {_test}
+export {
+  _test
+}
