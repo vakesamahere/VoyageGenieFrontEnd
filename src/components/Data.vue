@@ -6,11 +6,10 @@
             <el-col :span="1"></el-col>
             <el-col :span="21"><span>编辑资料</span></el-col>
             <el-col :span="2" class="avatar">
-              <div v-if="!isUploadEnabled" class="avatar-uploader">
+              <!-- <div v-if="!isUploadEnabled" class="avatar-uploader">
                 <img :src="defaultImage" class="avatar" />
-              </div>
+              </div> -->
             <el-upload
-              v-else
               class="avatar-uploader"
               :show-file-list="false"
               :on-change="handleFileChange"
@@ -95,7 +94,7 @@ const store = useStore();
 const userId = ref(store.state.userId);
 const defaultImage = ref('')  // 替换成你的Base64图片
   
-  const imageUrl = ref('')
+  const imageUrl = ref(store.state.userAvatar)
   
   // 启用上传功能
   const enableUpload = () => {
@@ -107,22 +106,36 @@ const defaultImage = ref('')  // 替换成你的Base64图片
 const getUserId = computed(() => store.state.userId);
 
 // 监听userId变化
-watch(() => store.getters.getUserId, (newVal, oldVal) => {
+watch(() => store.state.userId, (newVal, oldVal) => {
  console.log(`User ID changed from ${oldVal} to ${newVal}`);
+  cover.value=store.state.userAvatar
+  imageUrl.value=store.state.userAvatar
       // 执行其他需要的操作
  });
+// 监听cover变化
+watch(() => cover.value, (newVal, oldVal) => {
+ checkCover(newVal)
+ },{immediate:false});
+ const checkCover = (c) => {
+    var img = new Image();
+    img.onload = function() {
+      console.log('Image loaded successfully');
+      if(c===store.state.userAvatar){
+        return
+      }
+      uploadData()
+    };
+    img.onerror = function() {
+      console.log('Image failed to load');
+    };
+    img.src = c;
+ }
  const handleFileChange: UploadProps['onChange'] = (file) => {
     const reader = new FileReader()
     reader.onload = async (e) => {
       const base64String = e.target?.result as string
       imageUrl.value = base64String
-  
-      try {
-        cover.value=imageUrl.value;
-        ElMessage.success('Avatar uploaded successfully!')
-      } catch (error) {
-        ElMessage.error('Failed to upload avatar')
-      }
+      cover.value=imageUrl.value;
     }
     reader.readAsDataURL(file.raw!)
   }
@@ -156,17 +169,16 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
   onMounted(() => {
     show(); 
   });
-  // 隐藏按钮 B 和 C，重新显示按钮 A
-  const save = async () => {
-    isDisabled.value = !isDisabled.value;
-    showA.value = true;
-    showBAndC.value = false;
+  const uploadData = async () => {
     try{
       const info=ref(JSON.stringify({"bio":bio.value,"cover":cover.value}));
       const data=ref({"user_id":userId.value,"email":email.value,"name":name.value,"tele":tele.value,"info":info.value})
       console.log(data.value);
       const res=await axios.post('http://1.94.170.22:5000/update_user_profile', data.value);
       response.value=res.data;
+      store.commit('setUserAvatar',cover.value)
+      store.commit('setUserName',name.value)
+      store.commit('setUserBio',bio.value)
     }catch(error:any){
       console.error('There was an error sending the post',error);
     }
@@ -190,6 +202,13 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
         offset:200
       })
     }
+  }
+  // 隐藏按钮 B 和 C，重新显示按钮 A
+  const save = async () => {
+    isDisabled.value = !isDisabled.value;
+    showA.value = true;
+    showBAndC.value = false;
+    uploadData();
     isUploadEnabled.value = false;
     show();
   };
