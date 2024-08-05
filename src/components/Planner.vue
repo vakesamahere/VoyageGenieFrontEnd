@@ -1,7 +1,7 @@
 <template>
     <el-container>
       <el-aside>
-        <div>
+        <el-main style="height:90%;padding: 0px;">
         <el-menu :default-active="$route.path"
           class="el-menu-demo chat"
           mode="vertical"
@@ -21,8 +21,9 @@
           :width="100"
           placement="right"
           trigger="hover"
+          style="padding: 0px;"
         >
-          <div style="text-align: center; margin: 0">
+          <div style="text-align: center; margin: 0;padding: 0px;">
             <el-button
               @click="deleteChat(chat.uid)"
               type="danger"
@@ -37,10 +38,14 @@
           </el-popover>
         </el-menu-item>
         </el-menu>
-      </div>
-        <div>
-        <el-icon @click="createChatSession()"><CirclePlusFilled /></el-icon>
-        </div>
+      </el-main>
+        <el-footer style="height: 10%;text-align: center;">
+        <el-icon  style="font-size: 80px;margin-top: -20px;z-index: 1000;color:rgb(255,194,151); 
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);border-radius: 50%;  
+        background-image: radial-gradient(circle at 50% 50%, #fff, #fad0c4); "
+        @click="createChatSession()">
+          <CirclePlusFilled /></el-icon>
+        </el-footer>
       </el-aside>
       <el-main class="planner">
        <router-view :currentChat="currentChat"/>
@@ -128,8 +133,7 @@ const loadAllChat = async (userid) => {
   try {
     const response = await axios.get(`${API_URL}/get_all_chats?user_id=${userid}`);
     chats.value = response.data;
-    console.log(chats.value);
-    //switchChat(chats.value[0].uid);
+    switchChat(chats.value[0].uid);
   } catch (error) {
     console.error('Error fetching chats:', error);
   }
@@ -482,7 +486,6 @@ import { RefSymbol } from '@vue/reactivity';
   }
 
 
-
   const eventSource = ref<EventSource | null>(null);
 
   function sendPost(inputText: {}) {
@@ -539,6 +542,7 @@ import { RefSymbol } from '@vue/reactivity';
 }
 </script>
 <style scoped>
+
 .el-container{
   height: 100%;
   position: relative;
@@ -546,7 +550,7 @@ import { RefSymbol } from '@vue/reactivity';
 .el-aside{
   height: 100%;
   width: 25%;
-  background-color: aqua;
+  background-color: #fff;
   position: absolute;
   z-index: 1000
 }

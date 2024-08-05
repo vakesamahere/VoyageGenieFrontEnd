@@ -9,9 +9,7 @@
               </el-card>
               <p style="height: 8px;"></p>
                 </div>
-            </div>
-            <p style="height: 8px;"></p>
-            <el-button plain @click="dialogVisible = true">预览</el-button>
+            </div>     
             <el-dialog
               v-model="dialogVisible"
 
@@ -52,19 +50,17 @@
             </el-input>
             <!-- 输入框绑定 v-model 以获取用户输入 -->
             <!-- 按钮点击时触发 addTextDiv 方法 -->
-            <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 50px;margin-left: 1%;">发送</el-button>
-            <el-popover
-              placement="top-start"
-              title="帖子"
-              :width="200"
-              trigger="hover"
-              content="this is content, this is content, this is content"
-              
-            >
-              <template  #reference >
+            <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;">发送</el-button>
+            <el-dropdown>
                 <el-avatar src="https://avatars.githubusercontent.com/u/72015883?v=4" style="margin-top: 50px;" />
-              </template>
-            </el-popover>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item v-for="(item) in textList2" @click="dialogVisible=true">
+                      {{item.message}}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+            </el-dropdown>
            
           </div>
         </el-footer>
@@ -118,7 +114,7 @@ if (props.currentChat && props.currentChat.history) {
   try {
     // 假设currentChat.history是一个JSON格式的字符串
     textList.value = JSON.parse(props.currentChat.history).messages;
-    textList2.value = [];
+    textList2.value = JSON.parse(props.currentChat.agentMemory);
     console.log('更新:'+textList.value[0].from);
   } catch (error) {
     console.error('Error parsing currentChat.history:', error);
@@ -415,7 +411,8 @@ function sendPost(inputText: {}) {
 console.log("sendPost:", inputText);
 const postData = {
   // 这里填写你要发送的 JSON 数据
-  message: inputText
+  message: inputText,
+  rep:"%n"
 };
 console.log("postData:", postData);
 
@@ -443,18 +440,21 @@ fetch('http://1.94.170.22:6001/chat', {
   let currentMessage = null;
   function readStream(list,list2,index,index2) {
       reader.read().then(({ done, value }) => {
-      const chunk = decoder.decode(value, { stream: true });
+      const txt = decoder.decode(value, { stream: true });
+      const chunks = txt.split(/\n\n/); // 按 \n\n 分割
+      chunks.slice(0, -1).forEach((text) =>{
+      const chunk = text.replace(/%n/g, '\n').trim(); // 替换 %n 为 \n
       if (chunk.includes('data: [end]')) {
+        alert(chunk)
         console.log('Stream complete');
         isdisable.value=false;
         index.value++;
         index2.value++;
-
         saveChatContent();
         return;
       }
-      if (chunk.includes('event: add')) {
-      const slicedChunk = chunk.slice(chunk.indexOf('data:') + 5).slice(0, -2).trim();
+      else if (chunk.includes('event: add')) {
+      const slicedChunk = chunk.slice(chunk.indexOf('data:') + 5).trim();
       if (!currentMessage) {
         currentMessage = {
           from: 'Agent',
@@ -468,7 +468,7 @@ fetch('http://1.94.170.22:6001/chat', {
       console.log(list.value[index.value]);
       console.log(index.value)
     }
-    if (chunk.includes('event: event')) {
+    else if (chunk.includes('event: event')) {
       const slicedChunk = chunk.slice(chunk.indexOf('data:') + 5).slice(0, -2).trim();
       if (!currentMessage2) {
         currentMessage2 = {
@@ -482,7 +482,7 @@ fetch('http://1.94.170.22:6001/chat', {
     }
       console.log('Received chunk:', chunk);
       readStream(list,list2,index,index2);
-    });
+    })});
   }
   readStream(textList,textList2,index1,index2);
 })
