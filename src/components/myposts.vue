@@ -2,28 +2,48 @@
   <div class="container-box">
       <div class="search-container">
           <el-menu
-              :default-active="selectIndex"
+              default-active="0"
               mode="vertical"
               background-color="var(--bg-color)"
               text-color="var(--display-text-color)"
-              active-text-color="var(--display-text-color-active)"
+              active-text-color="var(--color-light)"
               @select="handleSelect"
               class="search-history"
+              :key="vkey"
           >
               
               <el-menu-item
-                  v-for="(item, index) in searchHistory"
-                  :key="index"
-                  :index="index"
-                  @click="goToSquare(item.content,index)"
+                  index="0"
+                  @click="loadMyPosts()"
                   class="search-item"
                   >
-                  {{ item.display }}
+                  Notes
+              </el-menu-item>
+              <el-menu-item
+                  index="1"
+                  @click="loadMyLikes()"
+                  class="search-item"
+                  >
+                  Likes
+              </el-menu-item>
+              <el-menu-item
+                  index="2"
+                  @click="loadMyCollections()"
+                  class="search-item"
+                  >
+                  Collections
+              </el-menu-item>
+              <el-menu-item
+                  index="3"
+                  @click="loadMyInterests()"
+                  class="search-item"
+                  >
+                  Interests
               </el-menu-item>
           </el-menu>
       </div>
       <div class="waterfall-container">
-          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" @enterPost="handleEnterPost"></waterfall>
+          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :editable="editable" @enterPost="handleEnterPost" @deletePost="handleDelete"></waterfall>
       </div>
   </div>
 </template>
@@ -49,13 +69,9 @@ export default {
           windowWidth:0,
           windowHeight:0,
           wfDisplay:false,
-          searchHistory:[
-              {
-                  "display":"推荐",
-                  "content":""
-              }
-          ],
-          selectIndex:0
+          selectIndex:0,
+          editable:false,
+          vkey:0
       }
   },
   computed: {
@@ -63,24 +79,58 @@ export default {
           return this.$store.state.userId
       }
   },
+  watch:{
+    userId:{
+      handler(_,__){
+        this.vkey+=1;
+        this.loadMyPosts();
+      }
+    }
+  },
   methods:{
-      goToSquare(keyword,index) {
-          this.selectIndex=index
-          this.$router.push({
-              path: '/square',
-              query: {
-              keyword: keyword,
-              },
-          });
+      handleDelete(item){
+        axios.post('http://1.94.170.22:5000/delete_post',{
+            "post_id":item.uid
+        })
+        this.posts.splice(this.posts.indexOf(item),1)
       },
-      async loadPosts(){
-          const res = await axios.get(`http://1.94.170.22:5000/get_user_posts?user_id=${this.userId}&target_id=${this.userId}`);
+      async clearPosts(){
+          this.posts=[]
+      },
+      async loadMyPosts(){
+        this.clearPosts();
+        this.editable=true;
+        const res = await axios.get(`http://1.94.170.22:5000/get_user_posts?user_id=${this.userId}&target_id=${this.userId}`);
+        console.log(res);
+        setTimeout(() => {
+            this.posts=res.data
+        }, 700);
+      },
+      async loadMyLikes(){
+          this.clearPosts();
+          this.editable=false;
+          const res = await axios.get(`http://1.94.170.22:5000/get_user_likes?user_id=${this.userId}&target_id=${this.userId}`);
           console.log(res);
           setTimeout(() => {
               this.posts=res.data
-              if(_test){
-                  this.posts = this.posts.concat(testCovers)
-              }
+          }, 700);
+      },
+      async loadMyCollections(){
+          this.clearPosts();
+          this.editable=false;
+          const res = await axios.get(`http://1.94.170.22:5000/get_user_collections?user_id=${this.userId}&target_id=${this.userId}`);
+          console.log(res);
+          setTimeout(() => {
+              this.posts=res.data
+          }, 700);
+      },
+      async loadMyInterests(){
+          this.clearPosts();
+          this.editable=false;
+          const res = await axios.get(`http://1.94.170.22:5000/get_user_subscribes_post?user_id=${this.userId}&target_id=${this.userId}`);
+          console.log(res);
+          setTimeout(() => {
+              this.posts=res.data
           }, 700);
       },
       handleEnterPost(item){
@@ -101,8 +151,7 @@ export default {
         }
         this.reranderV()
         this.vvkey+=1;
-        this.loadPosts();
-        // alert('2');
+        // this.loadPosts();
       },
       async postAndcancel(id){
         try{
@@ -115,11 +164,11 @@ export default {
       }
       this.reranderV()
       this.vvkey+=1;
-      this.loadPosts();
+      // this.loadPosts();
       },
   },
   mounted(){
-      this.loadPosts()
+      // this.loadPosts()
       this.updateWindowSize()
       console.log(window.innerWidth);
       window.addEventListener('resize',this.updateWindowSize)

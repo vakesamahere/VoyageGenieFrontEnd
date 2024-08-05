@@ -57,6 +57,7 @@
 
 <script lang="ts" setup>
   import axios from 'axios';
+import { ElNotification } from 'element-plus';
   import { onMounted, ref,computed,watch } from 'vue'
   const name = ref('')
   const email= ref('')
@@ -116,10 +117,24 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
       console.error('There was an error sending the post',error);
     }
     if(response.value.status=='success'){
-      alert('修改成功！');
+      // alert('修改成功！');
+      ElNotification({
+        title:'Success',
+        type:'success',
+        message:'修改成功',
+        duration:1500,
+        offset:200
+      })
     }
     else{
-      alert(response.value.status+'修改失败！');
+      // alert(response.value.status+'修改失败！');
+      ElNotification({
+        title:'Oh No',
+        type:'error',
+        message:'修改失败...Something Wrong',
+        duration:1500,
+        offset:200
+      })
     }
     show();
   };

@@ -40,6 +40,7 @@
     </template>
  <script lang="ts" setup>
    import axios from 'axios';
+import { ElNotification } from 'element-plus';
   import { ref,defineEmits } from 'vue';
   const emit = defineEmits(['cancel','recover'])
   const email = ref('');
@@ -60,10 +61,23 @@ const handleRecover = async () =>  {
       response.value = { result: error.message };
     }
     if(response.value.result==0){
-      alert('未查询到该用户！');
+      // alert('未查询到该用户！');
+      ElNotification({
+        title:'Oh No',
+        type:'error',
+        message:'未查询到该用户',
+        duration:1500,
+        offset:200
+      })
     }
     else{
-      alert('重置密码成功');
+      ElNotification({
+        title:'Success',
+        type:'success',
+        message:'密码已修改',
+        duration:1500,
+        offset:200
+      })
     }
 };
 const cancel = () => {
@@ -72,7 +86,14 @@ const cancel = () => {
 };
 const send = () => {
     //
-    alert('已发送');
+    // alert('已发送');
+    ElNotification({
+      title:'Info',
+      type:'info',
+      message:'已发送',
+      duration:1500,
+      offset:200
+    })
 };
 </script>
 
