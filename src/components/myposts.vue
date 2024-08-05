@@ -43,7 +43,7 @@
           </el-menu>
       </div>
       <div class="waterfall-container">
-          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :editable="editable" @enterPost="handleEnterPost" @deletePost="handleDelete" @loadingChange="loadingChange"></waterfall>
+          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :editable="editable" :trigger="wfTrigger" @enterPost="handleEnterPost" @deletePost="handleDelete" @loadingChange="loadingChange"></waterfall>
       </div>
   </div>
 </template>
@@ -72,7 +72,8 @@ export default {
           selectIndex:0,
           editable:false,
           vkey:0,
-          wfLoading:true
+          wfLoading:true,
+          wfTrigger:0
       }
   },
   computed: {
@@ -116,6 +117,11 @@ export default {
     }
   },
   methods:{
+      ifEmpty(){
+        if(this.posts.length===0){
+          this.wfTrigger+=1
+        }
+      },
       loadingChange(value){
         this.wfLoading = value
       },
@@ -136,6 +142,7 @@ export default {
         console.log(res);
         setTimeout(() => {
             this.posts=res.data
+            this.ifEmpty()
         }, 700);
       },
       async loadMyLikes(){
@@ -146,6 +153,7 @@ export default {
           console.log(res);
           setTimeout(() => {
               this.posts=res.data
+              this.ifEmpty()
           }, 700);
       },
       async loadMyCollections(){
@@ -156,6 +164,7 @@ export default {
           console.log(res);
           setTimeout(() => {
               this.posts=res.data
+              this.ifEmpty()
           }, 700);
       },
       async loadMyInterests(){
@@ -166,6 +175,7 @@ export default {
           console.log(res);
           setTimeout(() => {
               this.posts=res.data
+              this.ifEmpty()
           }, 700);
       },
       handleEnterPost(item){

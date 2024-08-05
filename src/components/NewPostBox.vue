@@ -62,7 +62,7 @@ export default {
     watch:{
         detailText:{
             handler(newv,oldv){
-                alert(newv)
+                // alert(newv)
             }
         }
     }

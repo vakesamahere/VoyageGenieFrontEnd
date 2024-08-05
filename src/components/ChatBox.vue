@@ -462,7 +462,7 @@ fetch('http://1.94.170.22:6001/chat', {
       chunks.slice(0, -1).forEach((text) =>{
       const chunk = text.replace(/%n/g, '\n').trim(); // 替换 %n 为 \n
       if (chunk.includes('data: [end]')) {
-        alert(chunk)
+        // alert(chunk)
         console.log('Stream complete');
         isdisable.value=false;
         index.value++;

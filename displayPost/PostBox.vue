@@ -35,7 +35,19 @@ export default {
   },
   computed:{
     postRoutes(){
-      if(!this.post||!this.post.routes){
+      // if(!this.post||!this.post.routes){
+      // }
+      try {
+        return encodeURIComponent(JSON.stringify(JSON.parse(this.post.routes).flatMap(route => 
+          route.events.map(event => ({
+              place: '',
+              title: event.name,
+              title2: '',
+              description: event.description,
+              image: event.images[0] || ''
+          }))
+        )));
+      } catch (error) {
         return encodeURIComponent(JSON.stringify([
                 {
                     place:'place name 2',
@@ -74,15 +86,6 @@ export default {
                 },
             ]))
       }
-      return encodeURIComponent(JSON.stringify(JSON.parse(this.post.routes).flatMap(route => 
-        route.events.map(event => ({
-            place: '',
-            title: event.name,
-            title2: '',
-            description: event.description,
-            image: event.images[0] || ''
-        }))
-      )));
     },
     postText(){
       if(this.post==null){
