@@ -1,69 +1,61 @@
 <template>
     <el-container>
-        <el-main >
-          <el-scrollbar style="max-height: 100%;">
-              <div class="container">
-                <div v-for="message in textList">
-                  <el-card style="position: relative;">
-                  <strong>{{ message.from }}:</strong> {{ message.content }}
-                </el-card>
-                <p style="height: 8px;"></p>
-                  </div>
-              </div>
-              <p style="height: 8px;"></p>
-              <el-button plain @click="dialogVisible = true">预览</el-button>
-              <el-dialog
-                v-model="dialogVisible"
-
-
-                :width="dialogWidth"
-                
-
-                :before-close="handleClose"
-                align-center
-
-                >
-                  <span>
-                    <PostBox v-if="post" :post="post"/>
-                  </span>
-                  <template #footer>
-                      <div class="dialog-footer">
-                        <el-button @click="dialogVisible = false">取消</el-button>
-                        <el-button type="primary" @click="dialogVisible = false">
-                          保存
-                        </el-button>
-                      </div>
+      <el-aside>
+        <div>
+        <el-menu :default-active="$route.path"
+          class="el-menu-demo chat"
+          mode="vertical"
+          router>      
+          <el-menu-item 
+        v-for="chat in chats"
+        :index="'/chat/'+chat.uid"
+        :key="chat.uid"
+        class="chat-list-item"
+        :class="{ active: currentChatId === chat.uid }"
+        @click="switchChat(chat.uid)"
+        router
+      >
+          <h1>{{chat.uid}}</h1>
+          <el-popover
+          ref="popover"
+          :width="100"
+          placement="right"
+          trigger="hover"
+        >
+          <div style="text-align: center; margin: 0">
+            <el-button
+              @click="deleteChat(chat.uid)"
+              type="danger"
+              size="small"
+              :icon="Delete"
+              plain
+              >删除</el-button>
+          </div>
+                  <template #reference>
+                    <el-icon style="margin-right: 2px"><MoreFilled /></el-icon>
                   </template>
-              </el-dialog>
-              
-            </el-scrollbar>
-            
-        </el-main>
-        
-        <el-footer>
-          <div class="inputbox">
-              <el-input
-                v-model="inputText"
-                :autosize="{ minRows: 1, maxRows: 3 }"
-                style="width: 70%;"
-                type="textarea"
-                placeholder="请输入问题"
-                >
-              </el-input>
-              <!-- 输入框绑定 v-model 以获取用户输入 -->
-              <!-- 按钮点击时触发 addTextDiv 方法 -->
-              <el-button :disabled="isdisable" type="primary" @click="addTextDiv" style="margin-top: 50px;margin-left: 1%;">发送</el-button>
-            </div>
-          </el-footer>
-
+          </el-popover>
+        </el-menu-item>
+        </el-menu>
+      </div>
+        <div>
+        <el-icon @click="createChatSession()"><CirclePlusFilled /></el-icon>
+        </div>
+      </el-aside>
+      <el-main class="planner">
+       <router-view :currentChat="currentChat"/>
+      </el-main>
 
     </el-container>
 </template>
 <script lang="ts" setup>
-    import { watch,ref,defineProps, onMounted,onUnmounted } from 'vue'
-    import ChatBox from './ChatBox.vue';
+    import { watch,ref,defineProps, onMounted,onUnmounted,computed } from 'vue'
     import PostBox from './PostBox.vue';
     import axios from 'axios'; // 导入 axios 用于发送 HTTP 请求
+    import { useStore } from 'vuex';
+    import {Delete} from '@element-plus/icons-vue'
+    const store = useStore();
+    const userId = ref(store.state.userId);
     
     
     const API_URL = 'http://1.94.170.22:5000';
@@ -79,8 +71,20 @@
     const index2 = ref(0);
     let resizeListener = null;
     const dialogWidth = ref('60%'); // 默认宽度为60%
+    const chats = ref([]);
+    const currentChatId = ref(null);
+    const currentChat = ref(null);
 
+    // 使用getter获取userId
+    const getUserId = computed(() => store.state.userId);
 
+    // 监听userId变化
+    watch(() => store.getters.getUserId, (newVal, oldVal) => {
+      console.log(`User ID changed from ${oldVal} to ${newVal}`);
+      console.log(newVal);
+      loadAllChat(newVal);
+      // 执行其他需要的操作
+    });
 
     const props = defineProps({
       currentChat: Object,
@@ -94,7 +98,63 @@
   checkScreenSize();
   // 添加resize事件监听器
   resizeListener = window.addEventListener('resize', checkScreenSize);
+  loadAllChat(userId.value);
 });
+
+//新建chat
+async function createChatSession() {
+  try {
+    const response = await axios.post(`${API_URL}/create_chat`, {
+      user_id: userId.value, // 假设的用户ID
+      history: "{}",
+      agentMemory: "{}",
+    });
+    const newChatSession = {
+    uid: response.data.chat_uid,
+    history: "{}",
+    agentMemory: "{}",
+    };
+    chats.value.push(newChatSession);
+    switchChat(newChatSession.uid);
+    const chatUid = response.data.chat_uid;
+    console.log('新建聊天的 UID:', chatUid);
+  } catch (error) {
+    console.error('创建聊天会话失败:', error);
+  }
+}
+
+// 加载所有会话
+const loadAllChat = async (userid) => {
+  try {
+    const response = await axios.get(`${API_URL}/get_all_chats?user_id=${userid}`);
+    chats.value = response.data;
+    console.log(chats.value);
+    //switchChat(chats.value[0].uid);
+  } catch (error) {
+    console.error('Error fetching chats:', error);
+  }
+};
+
+//切换会话
+const switchChat = (chatId) => {
+  const chat = chats.value.find(c => c.uid === chatId);
+  currentChatId.value = chatId;
+  currentChat.value = chat;
+  console.log('切换到聊天:', chat.history);
+  loadAllChat(userId.value);
+};
+
+//删除chat
+const deleteChat = async (uid) => {
+  try {
+    const response = await axios.post(`${API_URL}/delete_chat`,{chat_id:uid});
+    // 处理成功情况，例如从列表中删除聊天
+    chats.value = chats.value.filter(chat => chat.uid !== uid);
+  } catch (error) {
+    // 处理错误情况
+    console.error('Delete chat failed:', error);
+  }
+};
 
 onUnmounted(() => {
   if (resizeListener) {
@@ -397,6 +457,7 @@ const post = ref<Post>({
       if (inputText.value.trim()) {
         //sdisable.value = true;
         textList.value.push({from:'user', content: inputText.value.trim()});
+        sendPost(inputText.value.trim());
         inputText.value = '';
         saveChatContent();
       
@@ -432,7 +493,7 @@ import { RefSymbol } from '@vue/reactivity';
     key: inputText
   };
 
-  fetch('http://127.0.0.1:5000/stream', {
+  fetch('http://1.94.170.22:6000/chat', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -478,48 +539,27 @@ import { RefSymbol } from '@vue/reactivity';
 }
 </script>
 <style scoped>
-.scrollbar-demo-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 1000px;
-  margin: 10px;
-  text-align: center;
-  border-radius: 4px;
-  background: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
+.el-container{
+  height: 100%;
+  position: relative;
 }
-.el-footer {
-  position:absolute;
-  background-color:#fff;
-  bottom: 0px;
-  width: 100%;
-  text-align: center;
-  height: 90px;
-  line-height: 70px;
-  padding: 0px;
-}
-.el-main{
-  position:absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 90px;
-  padding: 20px;
-  height: auto ;
-
-  overflow:visible;
-  background-color: #ffffff;
-}
-.inputbox{
+.el-aside{
+  height: 100%;
+  width: 25%;
+  background-color: aqua;
   position: absolute;
-  flex-direction: row;
-  bottom: 60px;
-  left: 15%;
-  right: 15%;
-  width:70%;
-  height: 50px;
-  z-index: 10;
+  z-index: 1000
+}
+.planner{
+  position:absolute;
+  height: 100%;
+  width:75%;
+  right:0;
+  background-color: aquamarine;
+}
+.el-footer{
+  height:100px;
+  width: 100%;
 }
 
 </style>
