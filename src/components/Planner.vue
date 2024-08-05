@@ -123,6 +123,7 @@ async function createChatSession() {
     switchChat(newChatSession.uid);
     const chatUid = response.data.chat_uid;
     console.log('新建聊天的 UID:', chatUid);
+    loadAllChat(userId.value);
   } catch (error) {
     console.error('创建聊天会话失败:', error);
   }
@@ -145,7 +146,7 @@ const switchChat = (chatId) => {
   currentChatId.value = chatId;
   currentChat.value = chat;
   console.log('切换到聊天:', chat.history);
-  loadAllChat(userId.value);
+  
 };
 
 //删除chat
@@ -154,6 +155,7 @@ const deleteChat = async (uid) => {
     const response = await axios.post(`${API_URL}/delete_chat`,{chat_id:uid});
     // 处理成功情况，例如从列表中删除聊天
     chats.value = chats.value.filter(chat => chat.uid !== uid);
+    loadAllChat(userId.value);
   } catch (error) {
     // 处理错误情况
     console.error('Delete chat failed:', error);

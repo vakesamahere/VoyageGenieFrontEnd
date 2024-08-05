@@ -1,4 +1,5 @@
 <template>
+   <iframe class="iframe-post" name="postbox" :src="`static/a.html?data=${trans(JSON.parse(textList2).routes)}`" width="100%" height="100%"></iframe>
   <el-container>
       <el-main >
         <el-scrollbar style="max-height: 100%;">
@@ -12,17 +13,12 @@
             </div>     
             <el-dialog
               v-model="dialogVisible"
-
-
               :width="dialogWidth"
-
-
               :before-close="handleClose"
               align-center
-
               >
                 <span>
-                  <PostBox v-if="post" :post="post"/>
+                 
                 </span>
                 <template #footer>
                     <div class="dialog-footer">
@@ -51,16 +47,7 @@
             <!-- 输入框绑定 v-model 以获取用户输入 -->
             <!-- 按钮点击时触发 addTextDiv 方法 -->
             <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;">发送</el-button>
-            <el-dropdown>
-                <el-avatar src="https://avatars.githubusercontent.com/u/72015883?v=4" style="margin-top: 50px;" />
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item v-for="(item) in textList2" @click="dialogVisible=true">
-                      {{item.message}}
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-            </el-dropdown>
+            <el-button @click="dialogVisible=true;console.log(textList2[0])" style="margin-top: 60px;">预览</el-button>
            
           </div>
         </el-footer>
@@ -71,7 +58,7 @@
 <script lang="ts" setup>
   import { watch,ref,defineProps, onMounted,onUnmounted } from 'vue'
   import ChatBox from './ChatBox.vue';
-  import PostBox from './PostBox.vue';
+  import PostBox from './NewPostBox.vue';
   import axios from 'axios'; // 导入 axios 用于发送 HTTP 请求
   
   
@@ -79,7 +66,7 @@
   const dialogVisible = ref(false)
   const inputText = ref('')
   const textList1 = ref([]); // 存储输入文本的列表，用于生成 div
-  const textList2 = ref([]); // 存储输入文本的列表，用于生成 div
+  const textList2 = ref(''); // 存储输入文本的列表，用于生成 div
   const listName = ref('1'); // 初始化 listName,用于区分列表
   const isdisable = ref(false);//按钮禁用状态
   const activeName = ref('1'); // 初始化 activeName
@@ -93,6 +80,21 @@
   const update=ref(0);
   
   const textList = ref([]);
+
+function trans(routes){
+ return encodeURIComponent(JSON.stringify(JSON.parse(routes).flatMap(route => 
+ route.events.map(event => ({
+ place: '',
+ title: event.name,
+ title2: '',
+ description: event.description,
+ image: event.images[0] || ''
+ }))
+ )));
+}
+
+
+
   onMounted(() => {
 // 初始化时检查屏幕尺寸，并设置dialogWidth
 checkScreenSize();
@@ -114,7 +116,7 @@ if (props.currentChat && props.currentChat.history) {
   try {
     // 假设currentChat.history是一个JSON格式的字符串
     textList.value = JSON.parse(props.currentChat.history).messages;
-    textList2.value = JSON.parse(props.currentChat.agentMemory);
+    textList2.value = props.currentChat.agentMemory;
     console.log('更新:'+textList.value[0].from);
   } catch (error) {
     console.error('Error parsing currentChat.history:', error);
@@ -145,7 +147,7 @@ try {
   const response = await axios.post(`${API_URL}/save_chat_content`, {
     chat_id: props.currentChat.uid,
     history: JSON.stringify({messages:  textList.value}),
-    agentMemory:  props.currentChat.agentMemory,
+    agentMemory:  JSON.stringify(textList2.value),
   });
   if (response.data.status === "success") {
     console.log("Chat content saved successfully.");
@@ -438,6 +440,7 @@ fetch('http://1.94.170.22:6001/chat', {
   index2.value=textList2.value.length;
   let currentMessage2 = null;
   let currentMessage = null;
+  console.log('event'+textList2.value[index2.value]);
   function readStream(list,list2,index,index2) {
       reader.read().then(({ done, value }) => {
       const txt = decoder.decode(value, { stream: true });
@@ -469,17 +472,13 @@ fetch('http://1.94.170.22:6001/chat', {
       console.log(index.value)
     }
     else if (chunk.includes('event: event')) {
-      const slicedChunk = chunk.slice(chunk.indexOf('data:') + 5).slice(0, -2).trim();
-      if (!currentMessage2) {
-        currentMessage2 = {
-          message: slicedChunk
-        };       
-      } else {
-        currentMessage2.content += slicedChunk;      
-      }
-      list2.value[index2.value] = currentMessage2;
+      if (chunk.includes('data: [gen_post]')){
+      const slicedChunk = chunk.slice(chunk.indexOf('data: [gen_post]') + 16).trim();
+      currentMessage2 += slicedChunk;      
+      list2.value[index2.value] = currentMessage2.replace(/^nullstart/, '').replace(/end$/, '');
       console.log('event'+list2.value[index2.value]);
     }
+  }
       console.log('Received chunk:', chunk);
       readStream(list,list2,index,index2);
     })});
