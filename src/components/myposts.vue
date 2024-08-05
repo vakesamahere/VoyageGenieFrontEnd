@@ -43,7 +43,7 @@
           </el-menu>
       </div>
       <div class="waterfall-container">
-          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :editable="editable" @enterPost="handleEnterPost" @deletePost="handleDelete"></waterfall>
+          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :editable="editable" @enterPost="handleEnterPost" @deletePost="handleDelete" @loadingChange="loadingChange"></waterfall>
       </div>
   </div>
 </template>
@@ -71,12 +71,16 @@ export default {
           wfDisplay:false,
           selectIndex:0,
           editable:false,
-          vkey:0
+          vkey:0,
+          wfLoading:true
       }
   },
   computed: {
       userId() {
           return this.$store.state.userId
+      },
+      router() {
+        return this.$router
       }
   },
   watch:{
@@ -85,9 +89,36 @@ export default {
         this.vkey+=1;
         this.loadMyPosts();
       }
+    },
+    router:{
+      handler(_,__){
+        if(this.wfLoading){
+          switch(this.selectIndex){
+            case 0:
+              this.loadMyPosts();
+              break;
+            case 1:
+              this.loadMyLikes();
+              break;
+            case 2:
+              this.loadMyCollections();
+              break;
+            case 3:
+              this.loadMyInterests();
+              break;
+            default:
+              //
+          }
+        }
+      },
+      deep:true,
+      immediate:true
     }
   },
   methods:{
+      loadingChange(value){
+        this.wfLoading = value
+      },
       handleDelete(item){
         axios.post('http://1.94.170.22:5000/delete_post',{
             "post_id":item.uid
@@ -99,6 +130,7 @@ export default {
       },
       async loadMyPosts(){
         this.clearPosts();
+        this.selectIndex=0;
         this.editable=true;
         const res = await axios.get(`http://1.94.170.22:5000/get_user_posts?user_id=${this.userId}&target_id=${this.userId}`);
         console.log(res);
@@ -109,6 +141,7 @@ export default {
       async loadMyLikes(){
           this.clearPosts();
           this.editable=false;
+          this.selectIndex=1;
           const res = await axios.get(`http://1.94.170.22:5000/get_user_likes?user_id=${this.userId}&target_id=${this.userId}`);
           console.log(res);
           setTimeout(() => {
@@ -118,6 +151,7 @@ export default {
       async loadMyCollections(){
           this.clearPosts();
           this.editable=false;
+          this.selectIndex=2;
           const res = await axios.get(`http://1.94.170.22:5000/get_user_collections?user_id=${this.userId}&target_id=${this.userId}`);
           console.log(res);
           setTimeout(() => {
@@ -127,6 +161,7 @@ export default {
       async loadMyInterests(){
           this.clearPosts();
           this.editable=false;
+          this.selectIndex=3;
           const res = await axios.get(`http://1.94.170.22:5000/get_user_subscribes_post?user_id=${this.userId}&target_id=${this.userId}`);
           console.log(res);
           setTimeout(() => {
