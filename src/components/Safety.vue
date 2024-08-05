@@ -60,6 +60,7 @@
 
 <script lang="ts" setup>
     import axios from 'axios';
+import { ElNotification } from 'element-plus';
     import { ref,watch,computed } from 'vue'
     const verification = ref('')
     const email= ref('')
@@ -91,7 +92,14 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
             console.error('There was an error fetching the data!',error);
         }
         if(RightPassword.value==password.value){
-                alert('新设密码与旧密码重复！不可修改');
+                // alert('新设密码与旧密码重复！不可修改');
+                ElNotification({
+                    title:'Oh No',
+                    type:'error',
+                    message:'新设密码与旧密码重复，不可修改',
+                    duration:1500,
+                    offset:200
+                })
                 return ;
         }
         else{
@@ -104,15 +112,36 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
         }
         if(response.value.result==0)
         {
-            alert('修改失败！');
+            // alert('修改失败！');
+            ElNotification({
+                title:'Oh No',
+                type:'error',
+                message:'修改失败...',
+                duration:1500,
+                offset:200
+            })
         }
         else{
-            alert('修改成功！');
+            // alert('修改成功！');
+            ElNotification({
+                title:'Success',
+                type:'success',
+                message:'修改成功',
+                duration:1500,
+                offset:200
+            })
         }
 
     }
     function click(){
-       alert('已发送');
+        // alert('已发送');
+        ElNotification({
+            title:'Info',
+            type:'info',
+            message:'已发送',
+            duration:1500,
+            offset:200
+        })
     }
     
 </script>

@@ -10,7 +10,7 @@
                       <h1 style="font-size: 25px;font-weight: bold;">{{ name }}</h1>
                       <p style="font-size: 18px; color: grey;font-weight: bold;"> {{bio}}</p>
                   </div>
-                  <el-avatar class="right-avatar" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" :size="70"></el-avatar>
+                  <el-avatar class="right-avatar" :src="userAvatar" :size="70" @click="goUserInfo"></el-avatar>
               </div>
           </el-header>
           <el-container class="container" >
@@ -32,6 +32,7 @@ const userId = ref(store.state.userId);
 
 // 使用getter获取userId
 const getUserId = computed(() => store.state.userId);
+const userAvatar = computed(() => store.state.userAvatar);
 
 // 监听userId变化
 watch(() => store.getters.getUserId, (newVal, oldVal) => {
@@ -44,52 +45,33 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
   const isDClick = ref(false)
   import axios from 'axios';
   const response=ref();
-  const name = ref('');
-  const bio=ref();
+  // const name = ref('');
+  // const bio=ref();
+  const name = computed(() => store.state.userName);
+  const bio = computed(() => store.state.userBio);
   const show=async ()=>{
     try{
         const res=await axios.get(`http://1.94.170.22:5000/get_user_profile?user_id=${userId.value}`);
         response.value=res.data;
-        bio.value=JSON.parse(response.value.info).bio;
-        name.value=response.value.name;
+        // bio.value=JSON.parse(response.value.info).bio;
+        // name.value=response.value.name;
+        
     }catch(error:any){
         console.error('There was an error fetching the data!',error);
     }
   };
   onMounted(() => {
   show(); 
-  });
-
-  
-  
-  function handleAClick() {
-      isAClick.value = true; 
-      isBClick.value = false;
-      isCClick.value = false;
-      isDClick.value = false;
-      router.push({name:'journey'});
-  }
-  function handleBClick() {
-    isAClick.value = false; 
-    isBClick.value = true;
-    isCClick.value = false;
-    isDClick.value = false;
-    router.push({name:'like'});
-  }
-  function handleCClick(){
-    isAClick.value = false; 
-    isBClick.value = false;
-    isCClick.value = true;
-    isDClick.value = false;
-    router.push({name:'collection'});
-  }
-  function handleDClick(){
-    isAClick.value = false; 
-    isBClick.value = false;
-    isCClick.value = false;
-    isDClick.value = true;
-    router.push({name:'interest'});
-  }
+  });  
+  function goUserInfo() {
+      if(!store.state.userId){
+        console.log('未登录');
+        // this.showLogin()
+        store.commit('setLoginVisible',true)
+        return
+      }
+      router.push('/data')
+    }
 </script>
 
 
@@ -161,6 +143,12 @@ width:auto;
 
 .right-avatar {
 margin-right: 20px; /* 确保头像距离右边20px */
+cursor: pointer;
+transition: all 0.3s ease-in-out;
+}
+.right-avatar:hover {
+scale: 1.2;
+filter: drop-shadow(0 0 25px var(--color-light));
 }
 .container{
 margin-top: 20px;

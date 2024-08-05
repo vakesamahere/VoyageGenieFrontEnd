@@ -2,38 +2,39 @@
   <div class="container-box">
       <div class="search-container">
           <el-menu
-              :default-active="selectIndex"
+              default-active="0"
               mode="vertical"
               background-color="var(--bg-color)"
               text-color="var(--display-text-color)"
-              active-text-color="var(--display-text-color-active)"
+              active-text-color="var(--color-light)"
               @select="handleSelect"
               class="search-history"
+              :key="vkey"
           >
               
               <el-menu-item
-                  :index="index"
+                  index="0"
                   @click="loadMyPosts()"
                   class="search-item"
                   >
                   Notes
               </el-menu-item>
               <el-menu-item
-                  :index="index"
+                  index="1"
                   @click="loadMyLikes()"
                   class="search-item"
                   >
                   Likes
               </el-menu-item>
               <el-menu-item
-                  :index="index"
+                  index="2"
                   @click="loadMyCollections()"
                   class="search-item"
                   >
                   Collections
               </el-menu-item>
               <el-menu-item
-                  :index="index"
+                  index="3"
                   @click="loadMyInterests()"
                   class="search-item"
                   >
@@ -42,7 +43,7 @@
           </el-menu>
       </div>
       <div class="waterfall-container">
-          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" @enterPost="handleEnterPost"></waterfall>
+          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :editable="editable" @enterPost="handleEnterPost" @deletePost="handleDelete"></waterfall>
       </div>
   </div>
 </template>
@@ -68,13 +69,9 @@ export default {
           windowWidth:0,
           windowHeight:0,
           wfDisplay:false,
-          searchHistory:[
-              {
-                  "display":"推荐",
-                  "content":""
-              }
-          ],
-          selectIndex:0
+          selectIndex:0,
+          editable:false,
+          vkey:0
       }
   },
   computed: {
@@ -82,12 +79,27 @@ export default {
           return this.$store.state.userId
       }
   },
+  watch:{
+    userId:{
+      handler(_,__){
+        this.vkey+=1;
+        this.loadMyPosts();
+      }
+    }
+  },
   methods:{
+      handleDelete(item){
+        axios.post('http://1.94.170.22:5000/delete_post',{
+            "post_id":item.uid
+        })
+        this.posts.splice(this.posts.indexOf(item),1)
+      },
       async clearPosts(){
           this.posts=[]
       },
       async loadMyPosts(){
         this.clearPosts();
+        this.editable=true;
         const res = await axios.get(`http://1.94.170.22:5000/get_user_posts?user_id=${this.userId}&target_id=${this.userId}`);
         console.log(res);
         setTimeout(() => {
@@ -95,7 +107,8 @@ export default {
         }, 700);
       },
       async loadMyLikes(){
-        this.clearPosts();
+          this.clearPosts();
+          this.editable=false;
           const res = await axios.get(`http://1.94.170.22:5000/get_user_likes?user_id=${this.userId}&target_id=${this.userId}`);
           console.log(res);
           setTimeout(() => {
@@ -103,7 +116,8 @@ export default {
           }, 700);
       },
       async loadMyCollections(){
-        this.clearPosts();
+          this.clearPosts();
+          this.editable=false;
           const res = await axios.get(`http://1.94.170.22:5000/get_user_collections?user_id=${this.userId}&target_id=${this.userId}`);
           console.log(res);
           setTimeout(() => {
@@ -111,7 +125,8 @@ export default {
           }, 700);
       },
       async loadMyInterests(){
-        this.clearPosts();
+          this.clearPosts();
+          this.editable=false;
           const res = await axios.get(`http://1.94.170.22:5000/get_user_subscribes_post?user_id=${this.userId}&target_id=${this.userId}`);
           console.log(res);
           setTimeout(() => {

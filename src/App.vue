@@ -48,7 +48,7 @@
               </div>
             </div>
             <template #reference>
-              <el-avatar src="https://tse2-mm.cn.bing.net/th/id/OIP-C.q3irb_--_nSoO-ID35c1nwHaHa?w=148&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7" circle class="menu-avatar" id="menu-avatar" @click="goUserInfo"></el-avatar>
+              <el-avatar :src="userAvatar" circle class="menu-avatar" id="menu-avatar" @click="goUserInfo"></el-avatar>
             </template>
           </el-popover>
         </div>
@@ -77,8 +77,6 @@
           <LoginBox @handleLogin="handleLogin"/>
         </span>
       </el-dialog>
-      <!-- <LoginBox class="login-box" :v-if="loginVisible" @handleLogin="handleLogin"></LoginBox> -->
-      <!-- end of login box -->
   </el-container>
 
   <transition name="fade">
@@ -131,6 +129,9 @@ export default {
       set(value) {
         this.$store.commit('setLoginVisible', value);
       }
+    },
+    userAvatar() {
+      return this.$store.state.userAvatar
     }
   },
   methods: {
@@ -298,8 +299,8 @@ export default {
   position: fixed;
   right: 0;
   top: 0;
-  width: 200px;
-  height: 200px;
+  /* width: 200px;
+  height: 200px; */
   z-index: 101;
 }
 .menu-user {

@@ -29,6 +29,7 @@
               <div class="card-container">
                 <div class="card-title">{{ slotProp.item.title }}</div>
                 <div class="buttons-container">
+                  <!-- start of like button -->
                   <div class="post-i-button" @click="handleLike(slotProp.item)">
                     <div class="col-trans">
                       <transition name="slide-du">
@@ -37,6 +38,8 @@
                       </transition>
                     </div>
                   </div>
+                  <!-- end of like button -->
+                  <!-- start of collect button -->
                   <div class="post-i-button" @click="handleCollect(slotProp.item)" >
                     <div class="col-trans">
                       <transition name="slide-du">
@@ -45,6 +48,24 @@
                       </transition>
                     </div>
                   </div>
+                  <!-- end of collect button -->
+                  <!-- start of public button -->
+                  <div v-if="editable" class="post-i-button" @click="handlePublic(slotProp.item)" >
+                    <div class="col-trans">
+                      <transition name="slide-du">
+                        <el-icon v-if="getButtonType(slotProp.item.ispublic)"><View /></el-icon>
+                        <el-icon v-else><Hide /></el-icon>
+                      </transition>
+                    </div>
+                  </div>
+                  <!-- end of public button -->
+                  <!-- start of delete button -->
+                  <div v-if="editable" class="post-i-button" @click="handleDelete(slotProp.item)" >
+                    <div class="col-trans">
+                        <el-icon><Delete /></el-icon>
+                    </div>
+                  </div>
+                  <!-- end of delete button -->
                 </div>
               </div>
               <div class="author-info">
@@ -101,7 +122,8 @@
   export default{
     props:{
       msg:String,
-      list:[]
+      list:[],
+      editable:false
     },
     watch: {
       list(newValue,oldValue){
@@ -123,7 +145,7 @@
         containerHeight:0,
         winWidth:0,
         winHeight:0,
-        loading:false,
+        loading:true,
         over:false,
         isMounted:true,
         isLimit:false,
@@ -185,6 +207,28 @@
             "post_id":item.uid,
             "user_id":this.$store.state.userId
         })
+      },
+      handlePublic(item) {
+        console.log('public');
+        if(item.ispublic===undefined){
+          item.ispublic=0
+        }
+        // 发送请求 toggling public status
+        item.ispublic = 1 - item.ispublic;
+        axios.post('http://1.94.170.22:5000/toggle_public',{
+            "post_id":item.uid
+        })
+      },
+      handleDelete(item) {
+        const confirmDelete = confirm('Are you sure you want to delete this post?');
+        if (confirmDelete) {
+          this.$emit('deletePost', item);
+          try {
+            this.localList.slice(this.localList.indexOf(item),1)
+          } catch (error) {
+            console.log(error);
+          }
+        }
       },
       getButtonType(bit) {
         // console.log(bit)

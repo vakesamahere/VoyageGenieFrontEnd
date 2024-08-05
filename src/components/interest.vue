@@ -102,7 +102,7 @@ export default {
         this.reranderV()
         this.vvkey+=1;
         this.loadPosts();
-        alert('2');
+        // alert('2');
       },
       async postAndcancel(id){
         try{
