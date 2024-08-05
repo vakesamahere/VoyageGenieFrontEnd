@@ -14,8 +14,8 @@
     <!-- end of left text area -->
     <!-- start of right routes -->
     <div class="routes-box">
-      <div v-for="(route,index) in postRoutes" :key="index" class="route-box">
-        <iframe :src="`${iframeUrl}${route}`" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+      <div class="route-box">
+        <iframe :src="`${iframeUrl}${postRoutes}`" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
     </div>
     <!-- end of right routes -->
@@ -36,7 +36,7 @@ export default {
   computed:{
     postRoutes(){
       if(!this.post||!this.post.routes){
-        return [encodeURIComponent(JSON.stringify([
+        return encodeURIComponent(JSON.stringify([
                 {
                     place:'place name 2',
                     title:'2-line1',
@@ -72,17 +72,17 @@ export default {
                     description:'Description6',
                     image:'https://assets.codepen.io/3685267/timed-cards-6.jpg'
                 },
-            ]))]
+            ]))
       }
-      return JSON.parse(this.post.routes).map(route => 
-          route.events.map(event => (encodeURIComponent(JSON.stringify({
-          place: '',
-          title: event.name,
-          title2: '',
-          description: event.description,
-          image: event.images[0] || ''
-          }))))
-      );
+      return encodeURIComponent(JSON.stringify(JSON.parse(this.post.routes).flatMap(route => 
+        route.events.map(event => ({
+            place: '',
+            title: event.name,
+            title2: '',
+            description: event.description,
+            image: event.images[0] || ''
+        }))
+      )));
     },
     postText(){
       if(this.post==null){

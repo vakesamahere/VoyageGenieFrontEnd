@@ -45,11 +45,11 @@
   const getUserId = computed(() => store.state.userId);
   
 
-function handleEnterPost(id){
-  alert(userId.value)
-  postId.value = id;
-  dialogVisible.value = true;
-}
+// function handleEnterPost(id){
+//   alert(userId.value)
+//   postId.value = id;
+//   dialogVisible.value = true;
+// }
   // 监听userId变化
   watch(() => store.getters.getUserId, (newVal, oldVal) => {
   console.log(`User ID changed from ${oldVal} to ${newVal}`);
