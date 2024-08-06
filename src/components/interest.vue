@@ -74,7 +74,7 @@ export default {
           });
       },
       async loadPosts(){
-          const res = await axios.get(`http://1.94.170.22:5000/get_user_posts?user_id=${this.userId}&target_id=${this.userId}`);
+          const res = await axios.get(`http://1.94.170.22:5000/get_user_posts?user_id=${this.$store.state.userId}&target_id=${this.$store.state.userId}`);
           console.log(res);
           setTimeout(() => {
               this.posts=res.data
