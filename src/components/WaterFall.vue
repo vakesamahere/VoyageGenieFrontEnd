@@ -133,24 +133,27 @@ export default{
     list:[],
     editable:false,
     trigger:0,
+    refresher:0
   },
   components:{
     PostDisplaying
   },
   watch: {
-    list(newValue,oldValue){
-      this.localList=[]
-      this.vvkey+=1;
-      this.localList=this.nextChunk
-      if(newValue.length!==0){
-        //end of loading
-        this.loading=false
-        this.$emit('loadingChange',false)
-      }else{
-        //start of loading
-        this.loading=true
-        this.$emit('loadingChange',true)
-      }
+    list:{
+      handler(newValue,oldValue){
+        this.localList=[]
+        // this.vvkey+=1;
+        this.localList=this.nextChunk
+        if(newValue.length!==0){
+          //end of loading
+          this.loading=false
+          this.$emit('loadingChange',false)
+        }else{
+          //start of loading
+          this.loading=true
+          this.$emit('loadingChange',true)
+        }
+      },deep:true
     },
     router:{
       handler(_,__){
@@ -162,6 +165,11 @@ export default{
     trigger:{
       handler(_,__){
         this.loading=false
+      }
+    },
+    refresher:{
+      handler(_,__){
+        this.vvkey+=1
       }
     }
   },
