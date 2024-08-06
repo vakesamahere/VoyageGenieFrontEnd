@@ -1,14 +1,15 @@
 <template>
   <el-container>
       <el-main >
-        <el-scrollbar style="max-height: 100%;">
-            <div class="container">
-              <div v-for="(message) in textList">
-                <el-card :key="update" style="position: relative;height:auto; white-space: pre-line;">
-                <strong>{{ message.from }}:</strong> {{ message.content }}
-              </el-card>
-              <p style="height: 8px;"></p>
+        <el-scrollbar ref="scrollbarRef" style="max-height: 100%;">
+            <div class="message-container">
+              <div v-for="(message, index) in textList" :key="update" class="message-container">
+                <div :class="['message-bubble', message.from === 'user' ? 'user-bubble' : 'other-bubble']">
+                  <!-- <strong>{{ message.from }}:</strong>  -->
+                  <!-- {{ message.content }} -->
+                  <span v-html="message.content.replace(/\n/g, '<br>')"></span>
                 </div>
+              </div>
             </div>     
             <el-dialog
               v-model="dialogVisible"
@@ -33,7 +34,7 @@
 
       </el-main>
 
-      <el-footer>
+      <el-footer style="background-color: transparent;">
         <div class="inputbox">
             <el-input
               v-model="inputText"
@@ -45,7 +46,7 @@
             </el-input>
             <!-- 输入框绑定 v-model 以获取用户输入 -->
             <!-- 按钮点击时触发 addTextDiv 方法 -->
-            <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;">发送</el-button>
+            <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;background-color: var(--color-light);border: none;">发送</el-button>
             <el-button @click="dialogVisible=true;post=JSON.parse(textList2)" style="margin-top: 60px;">预览</el-button>
            
           </div>
@@ -55,7 +56,7 @@
   </el-container>
 </template>
 <script lang="ts" setup>
-  import { watch,ref,defineProps, onMounted,onUnmounted } from 'vue'
+  import { watch,ref,defineProps, onMounted,onUnmounted, nextTick } from 'vue'
   import ChatBox from './ChatBox.vue';
   import PostBox from './PostBox.vue';
   import axios from 'axios'; // 导入 axios 用于发送 HTTP 请求
@@ -81,6 +82,13 @@
   
   const textList = ref([]);
 
+const scrollbarRef = ref()
+const innerRef = ref()
+async function setScrollToBottom() {
+  await nextTick()
+  const max = Number.MAX_SAFE_INTEGER
+  scrollbarRef.value!.setScrollTop(max)
+}
 function trans(tl2){
   // tl2 = textList2 -> string of json
   // need to get the routes:string of json(list)
@@ -130,7 +138,7 @@ if (props.currentChat && props.currentChat.history) {
       textList.value = []
     }
     textList2.value = props.currentChat.agentMemory;
-    console.log('更新:'+textList.value[0].from);
+    // console.log('更新:'+textList.value[0].from);
   } catch (error) {
     console.error('Error parsing currentChat.history:', error);
     // 可以设置一个错误状态或者进行其他错误处理
@@ -144,14 +152,17 @@ if (props.currentChat && props.currentChat.history) {
 onMounted(updateTextList);
 // 监听currentChat的变化，当它变化时更新textList
 watch(() => props.currentChat, (newVal, oldVal) => {
-  // 这里可以添加逻辑来处理currentChat变化时需要执行的操作
-  // 例如，如果只需要在currentChat.history变化时才更新textList
   if (!oldVal || newVal.history !== oldVal.history) {
     updateTextList();
     console.log('再更新:'+textList.value);
+    setScrollToBottom()
   }
+}, { deep: true });
+watch(() => textList, (newVal, oldVal) => {
+  setScrollToBottom()
 });
- 
+
+
   
 // 定义保存帖子的方法
 const saveChatContent = async () => {
@@ -396,6 +407,7 @@ routes: [
   });
   //用户发消息
   function addTextDiv() {
+    setScrollToBottom()
     if (inputText.value.trim()) {
       isdisable.value = true;
       textList.value.push({from:'user', content: inputText.value.trim()});
@@ -407,10 +419,11 @@ routes: [
   }
 }
 
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox, sliderEmits } from 'element-plus'
 import SendPost from '@/SendPost.vue';
 import { k } from 'vite/dist/node/types.d-aGj9QkWt';
 import { parse } from 'vue/compiler-sfc';
+import { ElScrollbar } from 'element-plus'
 
 const handleClose = (done: () => void) => {
   console.log(dialogWidth.value)
@@ -423,7 +436,7 @@ ElMessageBox.confirm('退出后您所做的修改全部消失，是否确认退�
   })
 }
 const eventSource = ref<EventSource | null>(null);
-function sendPost(inputText: {}) {
+async function sendPost(inputText: {}) {
 console.log("sendPost:", inputText);
 const postData = {
   // 这里填写你要发送的 JSON 数据
@@ -451,11 +464,13 @@ fetch('http://1.94.170.22:6001/chat', {
   const reader = body!.getReader();
   const decoder = new TextDecoder('utf-8');
   index1.value=textList.value.length;
-  index2.value=textList2.value.length;
+  index2.value=textList2.value.length;// ?
   let currentMessage2 = null;
   let currentMessage = null;
-  console.log('event'+textList2.value[index2.value]);
-  function readStream(list,list2,index,index2) {
+  // console.log('event'+textList2.value[index2.value]);
+  async function readStream(list,list2,index,index2) {
+      let need_read = false
+      let slicedChunk = ''
       reader.read().then(({ done, value }) => {
       const txt = decoder.decode(value, { stream: true });
       const chunks = txt.split(/\n\n/); // 按 \n\n 分割
@@ -471,30 +486,56 @@ fetch('http://1.94.170.22:6001/chat', {
         return;
       }
       else if (chunk.includes('event: add')) {
-      const slicedChunk = chunk.slice(chunk.indexOf('data:') + 5).trim();
+      slicedChunk = chunk.slice(chunk.indexOf('data:') + 5).trim();
       if (!currentMessage) {
         currentMessage = {
           from: 'Agent',
-          content: slicedChunk
-        };       
-      } else {
-        currentMessage.content += slicedChunk;      
-      }
-      list.value[index.value] = currentMessage;
-      update.value++;
-      console.log(list.value[index.value]);
-      console.log(index.value)
+          content: ''
+        };   
+        // index.value++;    
+      } 
+      // currentMessage.content += slicedChunk;
+      need_read=true
+      // update.value++;
+      // console.log(list.value[index.value]);
+      // console.log(index.value)
     }
     else if (chunk.includes('event: event')) {
       if (chunk.includes('data: [gen_post]')){
-      const slicedChunk = chunk.slice(chunk.indexOf('data: [gen_post]') + 16).trim();
-      currentMessage2 += slicedChunk;      
-      list2.value[index2.value] = currentMessage2.replace(/^nullstart/, '').replace(/end$/, '');
-      console.log('event'+list2.value[index2.value]);
+      const slicedChunkE = chunk.slice(chunk.indexOf('data: [gen_post]') + 16).trim();
+      currentMessage2 += slicedChunkE;      
+      list2.value += currentMessage2.replace(/^nullstart/, '').replace(/end$/, '');//按理说，一开始是空字符，没毛病
+      console.log('List 2',list2.value);
     }
   }
       console.log('Received chunk:', chunk);
-      readStream(list,list2,index,index2);
+
+      function typeWriterEffect(chunk: string, delay: number = 20): Promise<void> {
+        return new Promise((resolve) => {
+          let i = 0;
+          const interval = setInterval(() => {
+            if (i < chunk.length) {
+              currentMessage.content += chunk[i];
+              update.value++;
+              i++;
+              setScrollToBottom()
+            } else {
+              clearInterval(interval);
+              resolve(); // 当打字机效果完成时，resolve Promise
+            }
+          }, delay);
+        });
+      }
+
+      if(need_read){
+        typeWriterEffect(slicedChunk).then(()=>{
+          
+          list.value[index.value] = currentMessage;
+          readStream(list,list2,index,index2);
+        })
+      }else{
+        readStream(list,list2,index,index2);
+      }
     })});
   }
   readStream(textList,textList2,index1,index2);
@@ -536,7 +577,7 @@ bottom: 90px;
 padding: 20px;
 height: auto ;
 overflow:visible;
-background-color: #ffffff;
+background-color: var(--bg-color);
 }
 .inputbox{
 position: absolute;
@@ -547,5 +588,65 @@ right: 15%;
 width:70%;
 z-index: 10;
 }
+.el-main{
+  padding: 0;
+  margin: 0;
+  border: none;
+}
 
+.message-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.message-bubble {
+  max-width: 70%;
+  padding: 10px;
+  border-radius: 15px;
+  position: relative;
+  word-wrap: break-word;
+}
+
+.user-bubble {
+  align-self: flex-end;
+  background-color: rgba(215, 118, 10, 0.9);
+  color: white;
+}
+
+.other-bubble {
+  align-self: flex-start;
+  /* background-color: #e5e5ea; */
+  background-color: #181818;
+  color: #eee;
+}
+
+.sending {
+  position: relative;
+  overflow: hidden;
+}
+
+.sending::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shine 2s infinite;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.message-content {
+  white-space: pre-wrap;
+}
 </style>

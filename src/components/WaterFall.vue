@@ -154,7 +154,7 @@ export default{
     },
     router:{
       handler(_,__){
-        alert(1)
+        // alert(1)
         this.isPostDisplaying=false
       },
       // immediate:true

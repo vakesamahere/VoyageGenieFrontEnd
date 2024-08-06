@@ -2,8 +2,9 @@
   <h1 style="font-size:large;font-weight: bold;">{{ post.title }}</h1>
   <p style="margin-top: 10px;">{{ post.text }}</p>
   <el-carousel :interval="4000" type="card" height="200px" style="margin-top:20px">
-    <el-carousel-item v-for="(image,index) in post.images" :src="image" :key="index" class="topImg img">
-      <h3 text="2xl" justify="center">{{ image }}</h3>
+    <el-carousel-item v-for="(image,index) in getImages(post)" :src="image" :key="index" class="topImg img">
+      <!-- <h3 text="2xl" justify="center">{{ image }}</h3> -->
+       <img :src="image" alt="">
     </el-carousel-item>
   </el-carousel>
   <el-tabs
@@ -48,6 +49,26 @@
 
 <script lang="ts" setup>
 import { defineProps, onMounted, ref } from 'vue';
+
+function getImages(post) {
+  let images = [];
+  if (post && post.routes) {
+    post.routes.forEach(route => {
+      if (route && route.events) {
+        route.events.forEach(event => {
+          if (event && event.images) {
+            images.push(event.images[0]);
+            // event.images.forEach(element => {
+            //   console.log(element);
+            // });
+          }
+        });
+      }
+    });
+  }
+
+  return images;
+}
 
 // 定义 props 并使用 TypeScript 进行类型注解
 interface Post {
