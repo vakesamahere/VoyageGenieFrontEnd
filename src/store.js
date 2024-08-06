@@ -9,13 +9,17 @@ const store = createStore({
       visible:false,
       userAvatar:"https://tse4-mm.cn.bing.net/th/id/OIP-C.58XQcWZjBXmzOy6mofl5VwAAAA?w=178&h=180&c=7&r=0&o=5&pid=1.7", //base64 or url
       userName:"VoyageGenie",
-      userBio:"Click the avatar to sign in"
+      userBio:"Click the avatar to sign in",
+      searchRefresher:0
     };
   },
   mutations: {
     setUserId(state, id) {
       state.isLoggedIn = true;
       state.userId = id; // 提供一个方法来更新userId
+    },
+    invalidSearch(state){
+      state.searchRefresher+=1
     },
     setUserAvatar(state,avatar){
       state.userAvatar = avatar

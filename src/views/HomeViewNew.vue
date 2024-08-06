@@ -13,6 +13,7 @@
                   <el-avatar class="right-avatar" :src="userAvatar" :size="70" @click="goUserInfo"></el-avatar>
               </div>
           </el-header>
+           
           <el-container class="container" >
             <MyPosts />
           </el-container>

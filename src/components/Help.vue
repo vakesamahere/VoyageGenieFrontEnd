@@ -14,7 +14,7 @@
         </el-main>
       </el-container>
     </div>
-  </template>
+</template>
 
 
 <script lang="ts" setup>

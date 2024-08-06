@@ -25,7 +25,7 @@
                 <el-col :span="2"></el-col>
                 <el-col :span="14"><el-input v-model="verification" placeholder="请输入验证码" class="input"/></el-col>
                 <el-col :span="1"></el-col>
-                <el-col :span="5"><el-button type="primary" class="send-button" @click="click">发送验证码</el-button>  </el-col>
+                <el-col :span="5"><el-button type="primary" color="var(--color-light-light)" class="send-button" @click="click">发送验证码</el-button>  </el-col>
                 <el-col :span="2"></el-col>
             </el-row>
             <br>
@@ -50,7 +50,7 @@
 
             <el-row  class="row" >
                 <el-col :span="8"></el-col>
-                <el-col :span="8"><el-button type="primary" class="button" @click="handleclick">确定</el-button></el-col>
+                <el-col :span="8"><el-button type="primary" color="var(--color-light-light)" class="button" @click="handleclick">重置密码</el-button></el-col>
                 <el-col :span="8"></el-col>
             </el-row>
         </el-main>

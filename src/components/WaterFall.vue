@@ -159,7 +159,7 @@ export default{
       handler(_,__){
         // alert(1)
         this.isPostDisplaying=false
-      },
+      },deep:true
       // immediate:true
     },
     trigger:{
@@ -168,7 +168,7 @@ export default{
       }
     },
     refresher:{
-      handler(_,__){
+      handler(newv,oldv){
         this.vvkey+=1
       }
     }

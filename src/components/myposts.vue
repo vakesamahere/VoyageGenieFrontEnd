@@ -93,8 +93,8 @@ export default {
       }
     },
     router:{
-      handler(_,__){
-        if(this.wfLoading){
+      handler(newv,__){
+        if(this.$router.currentRoute.value.path==='/home'){
           switch(this.selectIndex){
             case 0:
               this.loadMyPosts();

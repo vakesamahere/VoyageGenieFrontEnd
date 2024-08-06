@@ -23,7 +23,7 @@
             </el-menu>
         </div>
         <div class="waterfall-container">
-            <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :trigger="wfTrigger" @enterPost="handleEnterPost"></waterfall>
+            <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :refresher="wfRefresher" :trigger="wfTrigger" @enterPost="handleEnterPost"></waterfall>
         </div>
     </div>
 </template>
@@ -45,6 +45,7 @@ export default {
     },
     data(){
         return {
+            wfRefresher:0,
             posts:[],
             windowWidth:0,
             windowHeight:0,
@@ -61,9 +62,8 @@ export default {
     },
     watch:{
         searchKeyword:{
-            handler(_,__){
-                // alert(this.searchKeyword)
-                this.handleSearch(this.searchKeyword)
+            handler(newv,oldv){
+                // this.handleSearch(this.searchKeyword)
             }
         },
         userId:{
@@ -71,12 +71,25 @@ export default {
                 // alert(this.searchKeyword)
                 this.handleSearch(this.searchKeyword)
             }
+        },
+        router:{
+            handler(newv,__){
+                console.log(this.$router.currentRoute.value.path);
+                if(this.$router.currentRoute.value.path==='/square'){
+                    this.handleSearch(this.searchKeyword)
+                }
+            },
+            deep:true,
+            immediate:true
         }
 
     },
     computed: {
         userId() {
             return this.$store.state.userId
+        },
+        router(){
+            return this.$router
         }
     },
     methods:{
@@ -93,8 +106,12 @@ export default {
                 keyword: keyword,
                 },
             });
+            //搜索刷新
+            this.handleSearch(keyword)
         },
         async handleSearch(keyword){
+            this.posts=[]
+            this.wfRefresher+=1
             if(this.searchHistory[this.selectIndex].content!==keyword){
                 // 跳转
                 const n = 8;
