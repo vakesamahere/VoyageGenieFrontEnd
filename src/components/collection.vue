@@ -115,12 +115,12 @@
       },
       async Getposts(){
         try{
-          const response=await axios.get('http://1.94.170.22:5000/get_user_collections?user_id='+this.userId);
+          const response=await axios.get('http://1.94.170.22:5000/get_user_collections?user_id='+this.$store.state.userId);
           
           this.list=response.data;
         }catch(error){
           console.error('There was an error fetching the data!', error);
-          console.log('http://1.94.170.22:5000/get_user_collections?user_id='+this.userId);
+          console.log('http://1.94.170.22:5000/get_user_collections?user_id='+this.$store.state.userId);
           this.response=error.messgae;
         }
       },
