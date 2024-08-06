@@ -86,7 +86,7 @@
       </div>
     </div>
   </transition>
-  <div class="black-frame">
+  <div class="top-bar">
   </div>
 </template>
 
@@ -289,7 +289,7 @@ export default {
   /* flex: 1;
   padding: 20px;
   overflow-y: auto; */
-  max-height: 86.5vh;
+  max-height: calc(84.5vh+7vh);
   width: 100vw; /* Ensure the main content takes full width */
   margin: 0;
   padding: 0;
@@ -321,7 +321,7 @@ export default {
 }
 .menu {
   z-index: 100;
-  height: 7vh;
+  height: 11vh;
   user-select: none;
 }
 .menu-item {
@@ -332,7 +332,7 @@ export default {
   align-self: center;
   position: absolute;
   right: 2vw;
-  top: 3.5vh; /* 0.5 * menu.height + menu.top */
+  top: 5.5vh; /* 0.5 * menu.height + menu.top */
   transform: translateY(-50%);
   transition: all 0.4s ease-out;
 }
@@ -414,11 +414,53 @@ export default {
   padding-left: 2vw;
   color: #fff;
 }
-.black-frame {
+.top-bar {
   position: fixed;
-  background-color: var(--bg-color);
-  height: 7vh;
+  background-color: var(--color-light);
+  height: 0.3vh;
   width: 100vw;
-  bottom: 0;
+  top: 0;
+  z-index: 1000000;
+  overflow: hidden;
 }
+
+.top-bar::before,
+.top-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+}
+
+.top-bar::before {
+  left: -100%;
+  animation: shine1 3s infinite;
+}
+
+.top-bar::after {
+  left: 100%;
+  animation: shine2 2s infinite;
+}
+
+@keyframes shine1 {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes shine2 {
+  0% {
+    left: 100%;
+  }
+  100% {
+    left: -100%;
+  }
+}
+
+
 </style>

@@ -1,10 +1,10 @@
 <template>
-    <postBlock :post="post" @click="handleCommentHide" class="post-block"></postBlock>
+    <postBlock :post="post" @toggleText="handleToggleText" @click="handleCommentHide" class="post-block" :class="toggleClass"></postBlock>
 
     <div id="rightBar" class="rightBar">
-        <div class="authorAvatar">
+        <!-- <div class="authorAvatar">
             <el-avatar :src="authorCover" circle @click="handleRedirectToAuthor" />
-        </div>
+        </div> -->
         <div class="rightBarButton">
             <el-button :type="likeButtonType" :icon="Pointer" circle @click="handleLike"/>
         </div>
@@ -14,9 +14,9 @@
         <div class="rightBarButton">
             <el-button type="primary" :icon="Comment" circle @click="handleCommentDisplay" />
         </div>
-        <div class="rightBarButton">
+        <!-- <div class="rightBarButton">
             <el-button type="primary" :icon="Edit" circle @click="handleRedirectToEdit" />
-        </div>
+        </div> -->
     </div>
     <transition :name="commentTransition">
         <div v-if="showCommentBlock" class="commentBlock" id="commentBlock">
@@ -123,7 +123,8 @@ export default {
         iscollect: 0,
         author:{
         },
-        showCommentBlock:false
+        showCommentBlock:false,
+        toggleClassHideText:true
     }
   },
   components:{
@@ -131,9 +132,12 @@ export default {
     commentBlock
   },
   methods: {
+    handleToggleText(value){
+        this.toggleClassHideText=value;
+    },
     handleLike() {
         console.log('like');
-        alert(this.userId)
+        // alert(this.userId)
         axios.post('http://1.94.170.22:5000/toggle_like',{
             "post_id":this.postId,
             "user_id":this.userId
@@ -207,7 +211,7 @@ export default {
   mounted() {
     //
     //alert(this.postId)
-    alert("in"+this.userId)
+    // alert("in"+this.userId)
     this.getPostContent();
   },
   computed:{
@@ -216,6 +220,9 @@ export default {
     },
     commentTransition() {
         return this.showCommentBlock?'slide-ud':'slide-du'
+    },
+    toggleClass(){
+        return this.toggleClassHideText?'hide-text':'show-text'
     },
     likeButtonType(){
         if(this.islike==0){
@@ -501,7 +508,7 @@ export default {
     position: fixed;
     right: 0.5vw;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-20%);
     z-index: 11;
 }
 .rightBarButton {
@@ -535,12 +542,17 @@ export default {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-47%);
     height: 80vh;
     width: 80vw;
-    filter: drop-shadow(0 0 15px var(--color-light));
     border-radius: 20px;
     z-index: 6;
+}
+.post-block.hide-text {
+    filter: drop-shadow(0 0 15px var(--color-light));
+}
+.post-block.show-text {
+    filter: drop-shadow(0 0 45px #000);
 }
 
 .click-block {

@@ -31,6 +31,7 @@ app.mount('#app')
 // 定义CSS变量
 const cssVariables = {
   '--color-light': 'rgb(255, 128, 0)',
+  '--color-light-light': 'rgb(255, 148, 40)',
   // '--color-light': '#ff6fb4',
   '--bg-color': '#111',
   '--display-text-color': '#bbb',

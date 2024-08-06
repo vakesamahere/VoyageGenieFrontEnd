@@ -5,6 +5,9 @@
         <el-menu :default-active="$route.path"
           class="el-menu-demo chat"
           mode="vertical"
+          background-color="var(--bg-color)"
+          text-color="var(--display-text-color)"
+          active-text-color="var(--display-text-color-active)"
           router>      
           <el-menu-item 
         v-for="chat in chats"
@@ -13,6 +16,7 @@
         class="chat-list-item"
         :class="{ active: currentChatId === chat.uid }"
         @click="switchChat(chat.uid)"
+        style="background-color: var(--bg-color);"
         router
       >
           <h1>{{chat.uid}}</h1>
@@ -21,11 +25,12 @@
           :width="100"
           placement="right"
           trigger="hover"
-          style="padding: 0px;"
+          popper-style="padding: 0px;border:1px solid var(--color-light);"
         >
-          <div style="text-align: center; margin: 0;padding: 0px;">
+          <div style="text-align: center; margin: 0;padding: 0px;background-color: var(--color-light);">
             <el-button
               @click="deleteChat(chat.uid)"
+              style="background-color: transparent;border: none;color: #fff;"
               type="danger"
               size="small"
               :icon="Delete"
@@ -40,10 +45,10 @@
         </el-menu>
       </el-main>
         <el-footer style="height: 10%;text-align: center;">
-        <el-icon  style="font-size: 80px;margin-top: -20px;z-index: 1000;color:rgb(255,194,151); 
+        <el-icon  style="font-size: 5.5vh;margin-top: -30%;z-index: 1000;color:rgb(255,194,151); 
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);border-radius: 50%;  
         background-image: radial-gradient(circle at 50% 50%, #fff, #fad0c4); "
-        @click="createChatSession">
+        @click="createChatSession" class="add-button">
           <CirclePlusFilled /></el-icon>
         </el-footer>
       </el-aside>
@@ -551,21 +556,31 @@ import { RefSymbol } from '@vue/reactivity';
 }
 .el-aside{
   height: 100%;
-  width: 25%;
-  background-color: #fff;
+  width: 15%;
+  background-color: var(--bg-color);
   position: absolute;
   z-index: 1000
 }
 .planner{
   position:absolute;
   height: 100%;
-  width:75%;
+  width: 85%;
   right:0;
-  background-color: aquamarine;
+  background-color: var(--bg-color);
+  flex-shrink: 0;
 }
 .el-footer{
   height:100px;
   width: 100%;
 }
+.chat-list-item{
+  justify-content: center;
+}
 
+.add-button {
+  transition: all 0.2s ease;
+}
+.add-button:hover {
+  scale: 1.15;
+}
 </style>
