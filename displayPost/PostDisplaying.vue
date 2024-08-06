@@ -137,10 +137,10 @@ export default {
     },
     handleLike() {
         console.log('like');
-        // alert(this.userId)
+        // alert(this.$store.state.userId)
         axios.post('http://1.94.170.22:5000/toggle_like',{
             "post_id":this.postId,
-            "user_id":this.userId
+            "user_id":this.$store.state.userId
         })
         this.islike = 1-this.islike
     },
@@ -148,7 +148,7 @@ export default {
         console.log('collect');
         axios.post('http://1.94.170.22:5000/toggle_collection',{
             "post_id":this.postId,
-            "user_id":this.userId
+            "user_id":this.$store.state.userId
         })
         this.iscollect = 1-this.iscollect
     },
@@ -181,7 +181,7 @@ export default {
         console.log('comment hide');
         console.log(commentString);
         const data={
-            "user_id":this.userId,
+            "user_id":this.$store.state.userId,
             "post_id":this.postId,
             "content":commentString,
             "comment_id":reply?commentId:null,
@@ -196,7 +196,7 @@ export default {
         this.post = res.data.post;
         this.comments = res.data.comments;
 
-        const rightBarRes =await axios.get(`http://1.94.170.22:5000/get_post_details_about_user?post_id=${this.postId}&user_id=${this.userId}`)
+        const rightBarRes =await axios.get(`http://1.94.170.22:5000/get_post_details_about_user?post_id=${this.postId}&user_id=${this.$store.state.userId}`)
         this.islike=rightBarRes.data.islike
         this.iscollect=rightBarRes.data.iscollect
 
@@ -211,7 +211,7 @@ export default {
   mounted() {
     //
     //alert(this.postId)
-    // alert("in"+this.userId)
+    // alert("in"+this.$store.state.userId)
     this.getPostContent();
   },
   computed:{
