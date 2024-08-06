@@ -53,7 +53,7 @@
         </el-footer>
       </el-aside>
       <el-main class="planner">
-       <router-view :currentChat="currentChat"/>
+       <router-view :currentChat="currentChat" :userId="userId"/>
       </el-main>
 
     </el-container>
