@@ -53,7 +53,7 @@
         </el-footer>
       </el-aside>
       <el-main class="planner">
-       <router-view :currentChat="currentChat"/>
+       <router-view :currentChat="currentChat" :userId="userId"/>
       </el-main>
 
     </el-container>
@@ -139,7 +139,7 @@ const loadAllChat = async (userid) => {
   try {
     const response = await axios.get(`${API_URL}/get_all_chats?user_id=${userid}`);
     chats.value = response.data;
-    switchChat(chats.value[0].uid);
+    
   } catch (error) {
     console.error('Error fetching chats:', error);
   }
@@ -150,6 +150,7 @@ const switchChat = (chatId) => {
   const chat = chats.value.find(c => c.uid === chatId);
   currentChatId.value = chatId;
   currentChat.value = chat;
+  loadAllChat(store.state.userId);
   console.log('切换到聊天:', chat.history);
   
 };
@@ -557,6 +558,7 @@ import { RefSymbol } from '@vue/reactivity';
 .el-aside{
   height: 100%;
   width: 15%;
+  min-width: 100px;
   background-color: var(--bg-color);
   position: absolute;
   z-index: 1000
