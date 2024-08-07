@@ -43,7 +43,7 @@
           </el-menu>
       </div>
       <div class="waterfall-container">
-          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :editable="editable" :trigger="wfTrigger" @enterPost="handleEnterPost" @deletePost="handleDelete" @loadingChange="loadingChange"></waterfall>
+          <waterfall v-if="wfDisplay" class="waterfall" :list="posts" :editable="editable" :trigger="wfTrigger" :refresher="wfRefresher" @enterPost="handleEnterPost" @deletePost="handleDelete" @loadingChange="loadingChange"></waterfall>
       </div>
   </div>
 </template>
@@ -73,7 +73,8 @@ export default {
           editable:false,
           vkey:0,
           wfLoading:true,
-          wfTrigger:0
+          wfTrigger:0,
+          wfRefresher:0
       }
   },
   computed: {
@@ -92,8 +93,8 @@ export default {
       }
     },
     router:{
-      handler(_,__){
-        if(this.wfLoading){
+      handler(newv,__){
+        if(this.$router.currentRoute.value.path==='/home'){
           switch(this.selectIndex){
             case 0:
               this.loadMyPosts();
@@ -130,9 +131,11 @@ export default {
             "post_id":item.uid
         })
         this.posts.splice(this.posts.indexOf(item),1)
+        this.wfRefresher+=1
       },
       async clearPosts(){
           this.posts=[]
+          this.wfRefresher+=1;
       },
       async loadMyPosts(){
         this.clearPosts();

@@ -59,9 +59,9 @@
       </el-row>
 
           <el-row  class="row" >
-              <el-col :span="8"><el-button  v-if = "showBAndC" plain  class="button-cancel"  type="primary"  @click="cancel">取消</el-button></el-col>
-              <el-col :span="8"><el-button v-if = "showA"  class="button"type="primary" @click="alter">修改</el-button></el-col>
-              <el-col :span="8"><el-button v-if = "showBAndC"  class="button" type="primary"@click="save">保存</el-button></el-col>
+              <el-col :span="8"><el-button v-if = "showBAndC" color="error" class="button-cancel"  type="primary"  @click="cancel">取消</el-button></el-col>
+              <el-col :span="8"><el-button v-if = "showA" color="var(--color-light-light)"  class="button" type="primary" @click="alter">修改</el-button></el-col>
+              <el-col :span="8"><el-button v-if = "showBAndC" color="rgb(0,155,0)" class="button" type="primary"@click="save">保存</el-button></el-col>
           </el-row>
       </el-main>
     </el-container>

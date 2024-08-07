@@ -199,6 +199,7 @@ export default {
 }
 .text-area-box.hide-text {
   opacity: 0;
+  display: none;
 }
 .text-area-box.show-text {
   opacity: 1;

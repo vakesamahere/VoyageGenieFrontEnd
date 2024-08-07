@@ -48,7 +48,7 @@
             <!-- 输入框绑定 v-model 以获取用户输入 -->
             <!-- 按钮点击时触发 addTextDiv 方法 -->
             <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;background-color: var(--color-light);border: none;">发送</el-button>
-            <el-button @click="dialogVisible=true;post=JSON.parse(textList2)" style="margin-top: 60px;">预览</el-button>
+            <el-button :disabled="textList2=='{}'" @click="dialogVisible=true;post=JSON.parse(textList2)" style="margin-top: 60px;">预览</el-button>
            
           </div>
         </el-footer>
@@ -62,7 +62,7 @@
   import PostBox from './PostBox.vue';
   import axios from 'axios'; // 导入 axios 用于发送 HTTP 请求
   
-  
+  const isdone=ref(true);
   const API_URL = 'http://1.94.170.22:5000';
   const dialogVisible = ref(false)
   const inputText = ref('')
@@ -157,18 +157,20 @@ function updateTextList() {
 if (props.currentChat && props.currentChat.history) {
   try {
     // 假设currentChat.history是一个JSON格式的字符串
-    if(props.currentChat.history){
+    if(JSON.parse(props.currentChat.history).messages){
       textList.value = JSON.parse(props.currentChat.history).messages;
     }else{
       textList.value = []
     }
+    
     textList2.value = props.currentChat.agentMemory;
-    // console.log('更新:'+textList.value[0].from);
+    
+     console.log('更新:'+textList2.value);
   } catch (error) {
     console.error('Error parsing currentChat.history:', error);
     // 可以设置一个错误状态或者进行其他错误处理
     textList.value = [];
-    textList2.value = "";
+    textList2.value = "{}";
   }
 }
 
@@ -177,17 +179,47 @@ if (props.currentChat && props.currentChat.history) {
 onMounted(updateTextList);
 // 监听currentChat的变化，当它变化时更新textList
 watch(() => props.currentChat, (newVal, oldVal) => {
-  if (!oldVal || newVal.history !== oldVal.history) {
+
     updateTextList();
     console.log('再更新:'+textList.value);
     setScrollToBottom()
-  }
+  
 }, { deep: true });
 watch(() => textList, (newVal, oldVal) => {
   setScrollToBottom()
 });
 
-
+const savePost = async () => {
+ 
+console.log(JSON.stringify(JSON.parse(textList2.value).routes[0]))
+  try {
+    const response = await axios.post(`${API_URL}/save_generated_post`, {
+      user_id: props.userId,
+      title: JSON.parse(textList2.value).title,
+      cover:  JSON.parse(textList2.value).cover,
+      // images:JSON.stringify(["https://i2.hdslb.com/bfs/archive/9473235936af81b4f82ae56140ee5bc5914b1a0a.jpg"]),
+      images:'[]',
+      text:JSON.parse(textList2.value).text,
+      // routes:JSON.stringify([{"events": [{"name": "梅里雪山", "images": ["https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fss2.meipian.me%2Fusers%2F436572%2F78bddc745e5c44b7a9366e460fe9f997.jpeg%3Fmeipian-raw%2Fbucket%2Fivwen%2Fkey%2FdXNlcnMvNDM2NTcyLzc4YmRkYzc0NWU1YzQ0YjdhOTM2NmU0NjBmZTlmOTk3LmpwZWc%3D%2Fsign%2Fd56330df5186d8b8b2c87f59de9bfe18.jpg&refer=http%3A%2F%2Fss2.meipian.me&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1725500984&t=fa6c96112cf304aab4497d47bafba54e"], "description": "位于香格里拉德钦县，别称太子雪山。有十三座超过六千米的雪山，是藏区ツ八大神山之首。主峰卡瓦格博峰，海拔6740米。无数人至此只为看一眼梅里雪山的日照金山:日出时分阳光下，梅里雪山的雪峰上镀上了一层耀眼的金色，天地之间霎时光芒万丈"}, {"name": "新龙红山", "images": ["https://n.sinaimg.cn/spider20231212/99/w1500h999/20231212/d5ac-6aeb9427142f55ace58d4a84a2add9a4.jpg"], "description": "独特的丹霞地貌以景区标志性的两座红山而闻名，被誉为爱情的象征:一吻千年这次打卡红山景区，除了自然就是自己，粉红的梦幻之境小众但不缺美景!!!超适合拍照打卡的地方，小情侣的话一定要纪念哦~"}, {"name": "高原草甸", "images": ["https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fss2.meipian.me%2Fusers%2F4311789%2F2d84814fe1324fab9b41dd14d47c2991.jpg%3Fmeipian-raw%2Fbucket%2Fivwen%2Fkey%2FdXNlcnMvNDMxMTc4OS8yZDg0ODE0ZmUxMzI0ZmFiOWI0MWRkMTRkNDdjMjk5MS5qcGc%3D%2Fsign%2F05e261227180795d4749544e1dbf5f07.jpg&refer=http%3A%2F%2Fss2.meipian.me&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1725500987&t=4df294ca2b12d2d6a7e6819241cabe7d"], "description": "每年夏天都要去格聂待一个月时间7月的天气 偶尔晚上还需要烤火和朋友徒步去深山牧场骑麈托穿梭在原始森林里 捡菌子早上起来沿着村公路走看云海真的是仙境一般的地方"}, {"name": "雪山", "images": ["https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fss2.meipian.me%2Fusers%2F436572%2F7ed2d98f9a994717bccaae90fa627949.jpeg%3Fmeipian-raw%2Fbucket%2Fivwen%2Fkey%2FdXNlcnMvNDM2NTcyLzdlZDJkOThmOWE5OTQ3MTdiY2NhYWU5MGZhNjI3OTQ5LmpwZWc%3D%2Fsign%2Ffb136efddd7268bd376c42ef1cc81da6.jpg&refer=http%3A%2F%2Fss2.meipian.me&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1725501107&t=88282551955595752076445e06fe7350"], "description": "三座雪山，造型各异，遥相呼应"}]}]),
+      routes:JSON.stringify(JSON.parse(textList2.value).routes)
+    });
+    if (response.data.status === "success") {
+      console.log("Chat content saved successfully.");
+    } else {
+      console.error("Failed to save chat content.");
+    }
+    // 到这里都会成功，和status没啥关系
+    ElNotification({
+      title:'Success',
+      type:'success',
+      message:'已将帖子保存到个人空间，请在Home > Note中查看',
+      duration:1500,
+      offset:200
+    })
+  } catch (error) {
+    console.error("Error saving chat content:", error);
+  }
+};
   
 // 定义保存帖子的方法
 const saveChatContent = async () => {
@@ -196,7 +228,8 @@ const saveChatContent = async () => {
     const response = await axios.post(`${API_URL}/save_chat_content`, {
       chat_id: props.currentChat.uid,
       history: JSON.stringify({messages:  textList.value}),
-      agentMemory:  textList2.value,
+      agentMemory:  textList2.value===''?'{}':textList2.value.replace(/\\n/g, ''),
+
     });
     if (response.data.status === "success") {
       console.log("Chat content saved successfully.");
@@ -436,7 +469,8 @@ routes: [
     if (inputText.value.trim()) {
       isdisable.value = true;
       textList.value.push({from:'user', content: inputText.value.trim()});
-      const contentString = textList.value.map(item => item.content).join('\n');
+     // alert(textList.value);
+      const contentString = textList.value.map(item => item.content).join('\n');     
       sendPost(contentString);
       inputText.value = '';
       saveChatContent();
@@ -444,7 +478,7 @@ routes: [
   }
 }
 
-import { ElMessageBox, sliderEmits, useForwardRefDirective } from 'element-plus'
+import { ElMessageBox, sliderEmits, useForwardRefDirective, ElNotification } from 'element-plus'
 import SendPost from '@/SendPost.vue';
 import { k } from 'vite/dist/node/types.d-aGj9QkWt';
 import { parse } from 'vue/compiler-sfc';
@@ -460,6 +494,7 @@ ElMessageBox.confirm('退出后您所做的修改全部消失，是否确认退�
     // catch error
   })
 }
+
 const eventSource = ref<EventSource | null>(null);
 async function sendPost(inputText: {}) {
 console.log("sendPost:", inputText);
@@ -492,6 +527,7 @@ fetch('http://1.94.170.22:6001/chat', {
   index2.value=textList2.value.length;// ?
   let currentMessage2 = null;
   let currentMessage = null;
+  const isstart=ref(true);
   // console.log('event'+textList2.value[index2.value]);
   async function readStream(list,list2,index,index2) {
       let need_read = false
@@ -526,7 +562,11 @@ fetch('http://1.94.170.22:6001/chat', {
       // console.log(index.value)
     }
     else if (chunk.includes('event: event')) {
+      if(isstart){textList2.value='';isstart.value=false}
       if (chunk.includes('data: [gen_post]')){
+      if(chunk.includes('data: [gen_post]end')){
+        isdone.value=false
+      }
       const slicedChunkE = chunk.slice(chunk.indexOf('data: [gen_post]') + 16).trim();
       currentMessage2 += slicedChunkE;      
       list2.value += currentMessage2.replace(/^nullstart/, '').replace(/end$/, '');//按理说，一开始是空字符，没毛病

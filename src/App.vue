@@ -20,7 +20,7 @@
         <el-button icon="Search" circle class="SearchButton" @click = "handleSearchClick" 
           :style="{color:menuTextColor}"
         />
-        <el-menu-item :index="`/square?keyword=${lastSearchQuery}`" router class="menu-item">Square</el-menu-item>
+        <el-menu-item @click="this.$store.commit('invalidSearch')" :index="`/square?keyword=${lastSearchQuery}`" router class="menu-item">Square</el-menu-item>
         <el-menu-item index="/chat" router class="menu-item">Chat</el-menu-item>
         <el-menu-item index="/home" router class="menu-item">Home</el-menu-item>
         <el-menu-item index="/about" router class="menu-item">About</el-menu-item>
@@ -278,6 +278,7 @@ export default {
   width: 100vw;
   display: flex;
   flex-direction: column;
+  background-color: var(--bg-color);
 }
 .header {
   width: 100%;
