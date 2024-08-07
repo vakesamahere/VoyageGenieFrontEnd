@@ -16,7 +16,6 @@
               :width="dialogWidth"
               :before-close="handleClose"
               style="max-height: 80%;"
-
               align-center
               >
                 <span>
@@ -81,7 +80,6 @@
     currentChat: Object,
     userId: {
     type: Number,
-    required: true,
   }
   });
   const update=ref(0);
@@ -115,6 +113,27 @@ function trans(tl2){
   }))
   )));
 }
+
+const savePost= async () => {
+  try {
+    console.log(props.userId)
+    const response = await axios.post(`${API_URL}/save_generated_post`, {
+      user_id: props.userId,
+      title: JSON.parse(textList2.value).title,
+      cover:  JSON.parse(textList2.value).cover,
+      images:JSON.parse(textList2.value).images,
+      text: JSON.parse(textList2.value).text,
+      routes: JSON.parse(textList2.value).routes,
+    });
+    if (response.data.status === "success") {
+      console.log("post content saved successfully.");
+    } else {
+      console.error("Failed to save post content.");
+    }
+  } catch (error) {
+    console.error("Error saving post content:", error);
+  }
+};
 
 
 
@@ -459,7 +478,7 @@ routes: [
   }
 }
 
-import { ElMessageBox, ElNotification, sliderEmits } from 'element-plus'
+import { ElMessageBox, sliderEmits, useForwardRefDirective, ElNotification } from 'element-plus'
 import SendPost from '@/SendPost.vue';
 import { k } from 'vite/dist/node/types.d-aGj9QkWt';
 import { parse } from 'vue/compiler-sfc';
