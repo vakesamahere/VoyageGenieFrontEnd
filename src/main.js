@@ -35,6 +35,7 @@ const cssVariables = {
   // '--color-light': '#ff6fb4',
   '--bg-color': '#111',
   '--display-text-color': '#bbb',
+  '--color-text':'#f5f7f8',
   '--display-text-color-active': 'orange',
   // '--display-text-color-active': '#ff6fb4',
 };

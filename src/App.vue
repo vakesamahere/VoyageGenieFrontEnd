@@ -2,7 +2,7 @@
   <test v-if="false"></test>
   <el-container class="container">
       <!-- start of top bar -->
-      <el-icon v-if="isMobile" @click="drawerVisible = true" class="foldandexpand" style="margin-top: 20px;margin-left: 20px;color: rgb(255,128,0);font-size: xx-large;">
+      <el-icon v-if="isMobile" @click="drawerVisible = true" class="foldandexpand" style="margin-top: 25px;margin-left: 20px;color: rgb(255,128,0);font-size: xx-large;">
             <grid/>
       </el-icon>
       <el-menu v-if="!isMobile"

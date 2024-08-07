@@ -561,7 +561,6 @@ import { RefSymbol } from '@vue/reactivity';
   min-width: 100px;
   background-color: var(--bg-color);
   position: absolute;
-  z-index: 1000
 }
 .planner{
   position:absolute;
