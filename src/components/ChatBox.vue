@@ -114,29 +114,6 @@ function trans(tl2){
   )));
 }
 
-const savePost= async () => {
-  try {
-    console.log(props.userId)
-    const response = await axios.post(`${API_URL}/save_generated_post`, {
-      user_id: props.userId,
-      title: JSON.parse(textList2.value).title,
-      cover:  JSON.parse(textList2.value).cover,
-      images:JSON.parse(textList2.value).images,
-      text: JSON.parse(textList2.value).text,
-      routes: JSON.parse(textList2.value).routes,
-    });
-    if (response.data.status === "success") {
-      console.log("post content saved successfully.");
-    } else {
-      console.error("Failed to save post content.");
-    }
-  } catch (error) {
-    console.error("Error saving post content:", error);
-  }
-};
-
-
-
   onMounted(() => {
 // 初始化时检查屏幕尺寸，并设置dialogWidth
 checkScreenSize();
@@ -197,10 +174,8 @@ console.log(JSON.stringify(JSON.parse(textList2.value).routes[0]))
       user_id: props.userId,
       title: JSON.parse(textList2.value).title,
       cover:  JSON.parse(textList2.value).cover,
-      // images:JSON.stringify(["https://i2.hdslb.com/bfs/archive/9473235936af81b4f82ae56140ee5bc5914b1a0a.jpg"]),
       images:'[]',
       text:JSON.parse(textList2.value).text,
-      // routes:JSON.stringify([{"events": [{"name": "梅里雪山", "images": ["https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fss2.meipian.me%2Fusers%2F436572%2F78bddc745e5c44b7a9366e460fe9f997.jpeg%3Fmeipian-raw%2Fbucket%2Fivwen%2Fkey%2FdXNlcnMvNDM2NTcyLzc4YmRkYzc0NWU1YzQ0YjdhOTM2NmU0NjBmZTlmOTk3LmpwZWc%3D%2Fsign%2Fd56330df5186d8b8b2c87f59de9bfe18.jpg&refer=http%3A%2F%2Fss2.meipian.me&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1725500984&t=fa6c96112cf304aab4497d47bafba54e"], "description": "位于香格里拉德钦县，别称太子雪山。有十三座超过六千米的雪山，是藏区ツ八大神山之首。主峰卡瓦格博峰，海拔6740米。无数人至此只为看一眼梅里雪山的日照金山:日出时分阳光下，梅里雪山的雪峰上镀上了一层耀眼的金色，天地之间霎时光芒万丈"}, {"name": "新龙红山", "images": ["https://n.sinaimg.cn/spider20231212/99/w1500h999/20231212/d5ac-6aeb9427142f55ace58d4a84a2add9a4.jpg"], "description": "独特的丹霞地貌以景区标志性的两座红山而闻名，被誉为爱情的象征:一吻千年这次打卡红山景区，除了自然就是自己，粉红的梦幻之境小众但不缺美景!!!超适合拍照打卡的地方，小情侣的话一定要纪念哦~"}, {"name": "高原草甸", "images": ["https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fss2.meipian.me%2Fusers%2F4311789%2F2d84814fe1324fab9b41dd14d47c2991.jpg%3Fmeipian-raw%2Fbucket%2Fivwen%2Fkey%2FdXNlcnMvNDMxMTc4OS8yZDg0ODE0ZmUxMzI0ZmFiOWI0MWRkMTRkNDdjMjk5MS5qcGc%3D%2Fsign%2F05e261227180795d4749544e1dbf5f07.jpg&refer=http%3A%2F%2Fss2.meipian.me&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1725500987&t=4df294ca2b12d2d6a7e6819241cabe7d"], "description": "每年夏天都要去格聂待一个月时间7月的天气 偶尔晚上还需要烤火和朋友徒步去深山牧场骑麈托穿梭在原始森林里 捡菌子早上起来沿着村公路走看云海真的是仙境一般的地方"}, {"name": "雪山", "images": ["https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fss2.meipian.me%2Fusers%2F436572%2F7ed2d98f9a994717bccaae90fa627949.jpeg%3Fmeipian-raw%2Fbucket%2Fivwen%2Fkey%2FdXNlcnMvNDM2NTcyLzdlZDJkOThmOWE5OTQ3MTdiY2NhYWU5MGZhNjI3OTQ5LmpwZWc%3D%2Fsign%2Ffb136efddd7268bd376c42ef1cc81da6.jpg&refer=http%3A%2F%2Fss2.meipian.me&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1725501107&t=88282551955595752076445e06fe7350"], "description": "三座雪山，造型各异，遥相呼应"}]}]),
       routes:JSON.stringify(JSON.parse(textList2.value).routes)
     });
     if (response.data.status === "success") {
