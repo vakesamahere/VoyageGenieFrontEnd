@@ -47,7 +47,7 @@ import { ElNotification } from 'element-plus';
   const password = ref('');
   const code = ref('');
   const result=ref(0);
-  const data=ref({email,password,result});
+  const data=ref({email,"new_password":password.value,result});
   const response=ref();
 
 const handleRecover = async () =>  {
