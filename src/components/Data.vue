@@ -3,9 +3,12 @@
     <el-container>
       <el-header class="header" style="width: 100%;">
           <el-row>
-            <el-col :span="1"></el-col>
+            <el-col :span="2"></el-col>
             <el-col :span="21"><span>编辑资料</span></el-col>
-            <el-col :span="2" class="avatar">
+          </el-row>
+      </el-header>
+      <el-main class="main">
+        <div  class="avatar" style="padding-left: 8.5%;margin-top: -20px;">
               <!-- <div v-if="!isUploadEnabled" class="avatar-uploader">
                 <img :src="defaultImage" class="avatar" />
               </div> -->
@@ -18,10 +21,7 @@
             <img v-if="imageUrl" :src="imageUrl" class="avatar" />
               <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
             </el-upload>
-              </el-col>
-          </el-row>
-      </el-header>
-      <el-main class="main">
+          </div>
       <div class="tag">
           昵称
       </div>
@@ -57,11 +57,10 @@
           <el-col :span="20"><el-input v-model="bio" type="textarea" rows="4" :disabled="isDisabled" :placeholder="bio" class="introduce"/></el-col>
           <el-col :span="2"></el-col>
       </el-row>
-
           <el-row  class="row" >
               <el-col :span="8"><el-button v-if = "showBAndC" color="error" class="button-cancel"  type="primary"  @click="cancel">取消</el-button></el-col>
               <el-col :span="8"><el-button v-if = "showA" color="var(--color-light-light)"  class="button" type="primary" @click="alter">修改</el-button></el-col>
-              <el-col :span="8"><el-button v-if = "showBAndC" color="rgb(0,155,0)" class="button" type="primary"@click="save">保存</el-button></el-col>
+              <el-col :span="8"><el-button v-if = "showBAndC" color="rgb(0,155,0)"  class="button" type="primary"@click="save">保存</el-button></el-col>
           </el-row>
       </el-main>
     </el-container>
@@ -269,9 +268,10 @@ padding-left: 60px; /* 设置输入内容距离左边框 200px */
   font-weight: bold;
 }
 .button{
-  font-size: 20px;
-height: 50px;
-width: 100%;
+  color: white;
+  font-size: 15px;
+height: 30px;
+width:100%;
 display: flex;
 justify-content: center; 
 align-items: center; 
@@ -287,6 +287,7 @@ align-items: center;
 .row{
   display: flex;
   justify-content: flex-start;
+  margin-top: -55px;
   /* padding-left: 40px; */
 }
 .main{
@@ -298,13 +299,14 @@ align-items: center;
 }
 .avatar-uploader {
     border: 1px dashed var(--el-border-color);
-    border-radius: 50%;
+    border-radius: 0%;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     transition: var(--el-transition-duration-fast);
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
+    align-self: center;
   }
   
   .avatar-uploader:hover {
@@ -314,18 +316,26 @@ align-items: center;
   .el-icon.avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    min-height: 70px;
+    max-width: 70px;
+    max-height: 70px;
     text-align: center;
-    line-height: 50px;
+    line-height: 70px;
   }
-</style>
-
-<style scoped>
 .avatar-uploader .avatar {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
+  min-width: 70px;
+  min-height: 70px;
+  max-width: 70px;
+  max-height: 70px;
   display: block;
+  border-radius: 50%;
+}
+.avatar-uploader {
   border-radius: 50%;
 }
 </style>

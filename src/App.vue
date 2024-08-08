@@ -2,14 +2,16 @@
   <test v-if="false"></test>
   <el-container class="container">
       <!-- start of top bar -->
-      <el-menu
+      <el-icon v-if="isMobile" @click="drawerVisible = true" class="foldandexpand" style="margin-top: 25px;margin-left: 20px;color: rgb(255,128,0);font-size: xx-large;">
+            <grid/>
+      </el-icon>
+      <el-menu v-if="!isMobile"
         default-active="/chat"
         class="el-menu-demo menu"
         mode="horizontal"
         :background-color="bgColorAll"
         :text-color="menuTextColor"
         :active-text-color="menuTextColor"
-        @select="handleSelect"
         router
       >
         <!-- <img alt="Genie logo" class="genie" src="@/assets/genie.png"/> -->
@@ -25,6 +27,37 @@
         <el-menu-item index="/home" router class="menu-item">Home</el-menu-item>
         <el-menu-item index="/about" router class="menu-item">About</el-menu-item>
       </el-menu>
+
+    <el-drawer
+      v-model="drawerVisible"
+      :direction="'rtl'"
+      size="200px"
+      
+    >
+    <el-menu
+        default-active="/chat"
+        class="el-menu-demo menu1"
+        :background-color="bgColorAll"
+        :text-color="menuTextColor"
+        :active-text-color="menuTextColor"
+        style="height: 100%;width: 100%;margin-top:-20px"
+        router
+    >
+              <!-- <img alt="Genie logo" class="genie" src="@/assets/genie.png"/> -->
+              <div class="menulogo"
+          :style="{color:menuTextColor}"
+        >VG</div>
+        <el-col :span="1"></el-col>
+        <el-button icon="Search" circle class="SearchButton" @click = "handleSearchClick" 
+          :style="{color:menuTextColor}"
+        />
+        <el-menu-item @click="this.$store.commit('invalidSearch')" :index="`/square?keyword=${lastSearchQuery}`" router class="menu-item">Square</el-menu-item>
+        <el-menu-item index="/chat" router class="menu-item">Chat</el-menu-item>
+        <el-menu-item index="/home" router class="menu-item">Home</el-menu-item>
+        <el-menu-item index="/about" router class="menu-item">About</el-menu-item>
+      </el-menu>
+    </el-drawer>
+
       <!-- start of user profile -->
         <div class="hover-block">
           <el-popover
@@ -91,6 +124,7 @@
 </template>
 
 <script>
+
 import LoginBox from './components/LoginBox.vue';
 import NotificationPage from './components/NotificationPage.vue';
 import store from './store';
@@ -98,6 +132,35 @@ import store from './store';
 import test from './components/NewPostBox.vue'
 
 export default {
+  setup() {
+    // 创建响应式引用
+    const isMobile = ref(window.innerWidth < 768);
+    const drawerVisible = ref(false); // 抽屉默认不可见
+
+    // 更新媒体查询的函数
+    const updateMedia = () => {
+      isMobile.value = window.innerWidth < 768;
+    };
+
+    // 在组件挂载时添加事件监听器
+    const onMounted = () => {
+      window.addEventListener('resize', updateMedia);
+      //alert(isMobile.value);
+    };
+
+    // 在组件卸载前移除事件监听器
+    const onUnmounted = () => {
+      window.removeEventListener('resize', updateMedia);
+    };
+
+    // 将 onMounted 和 onUnmounted 函数暴露给组件的生命周期钩子
+    return {
+      isMobile,
+      drawerVisible,
+      onMounted,
+      onUnmounted
+    };
+  },
   data() {
     return {
       bgColorAll:'var(--bg-color)',//"#545c64",
@@ -105,7 +168,7 @@ export default {
       lastIndex:1,
       isSearchVisible:false,
       searchQuery:'',
-      lastSearchQuery:''
+      lastSearchQuery:'',
     };
   },
   components:{
@@ -216,13 +279,29 @@ export default {
     }
   },
   mounted() {
+    this.onMounted();
     window.addEventListener('keydown',this.handleEscKey);
   },
   beforeDestroy() {
+    this.onUnmounted();
     window.removeEventListener('keydown', this.handleEscKey);
-  }
+  },
+
 }
+import {
+      Fold,
+  } from '@element-plus/icons-vue'
+  import { ref } from 'vue';
+
+
+
+
+
+
 </script>
+
+
+
 
 
 <style>
@@ -323,11 +402,11 @@ export default {
 .menu {
   z-index: 100;
   height: 11vh;
-  user-select: none;
+  user-select: none; 
 }
 .menu-item {
   width: 5vw;
-  font-size: 1.8vh;
+  font-size: 1.8vh; 
 }
 .menu-avatar {
   align-self: center;
@@ -340,6 +419,7 @@ export default {
 .menu-avatar.ma-hover{
   scale: 2;
   transform: translateX(-40%) translateY(-10%);
+  
 }
 .el-menu--horizontal>.el-menu-item.is-active,
 .el-menu--horizontal>.el-menu-item {
@@ -418,7 +498,7 @@ export default {
 .top-bar {
   position: fixed;
   background-color: var(--color-light);
-  height: 0.3vh;
+  height: 1vh;
   width: 100vw;
   top: 0;
   z-index: 1000000;
@@ -463,5 +543,11 @@ export default {
   }
 }
 
+::v-deep .el-drawer {
+  background-color: var(--bg-color)!important;
+  padding:0px;
+  padding-top: 20px;
+  border-color: #fff
+}
 
 </style>

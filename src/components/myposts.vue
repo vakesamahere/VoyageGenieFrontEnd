@@ -250,7 +250,13 @@ export default {
   display: none;
 }
 .search-history {
-  padding-left: 10%;
+  padding-left: 5%;
   margin-right: 0%;
+}
+.el-menu-item{
+    min-width: 75px;
+    white-space: normal!important; 
+    word-break: break-all; 
+    line-height: normal; 
 }
 </style>

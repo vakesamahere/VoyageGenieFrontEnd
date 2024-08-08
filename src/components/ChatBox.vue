@@ -47,8 +47,8 @@
             </el-input>
             <!-- 输入框绑定 v-model 以获取用户输入 -->
             <!-- 按钮点击时触发 addTextDiv 方法 -->
-            <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;background-color: var(--color-light);border: none;">发送</el-button>
-            <el-button :disabled="textList2=='{}'" @click="dialogVisible=true;post=JSON.parse(textList2)" style="margin-top: 60px;">预览</el-button>
+            <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;background-color: var(--color-light);border: none;width:10%">发送</el-button>
+            <el-button :disabled="textList2=='{}'" @click="dialogVisible=true;post=JSON.parse(textList2)" style="margin-top: 60px;width:10%;margin-left: 1%;">预览</el-button>
            
           </div>
         </el-footer>
@@ -623,9 +623,9 @@ background-color: var(--bg-color);
 position: absolute;
 flex-direction: row;
 bottom: 60px;
-left: 15%;
-right: 15%;
-width:70%;
+left: 8%;
+right: 8%;
+width:84%;
 z-index: 10;
 }
 .el-main{
