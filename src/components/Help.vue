@@ -5,26 +5,29 @@
             <div class="barrage-container">
               <div v-for="(barrage, index) in barrages" :key="index" :class="barrage.class" :style="barrage.style"></div>
             </div>
-            <img alt="" src="/src/assets/genie.png" class="inserted-image">
+            <h2 style="text-align: center;">探索世界，从VoyageGenie开始 —— 您的智能旅行伴侣</h2>
+            <div class="container">
+            
             <section class="introduction-section">
                 <div class="introduction-container">
-                  <h2>探索世界，从VoyageGenie开始 —— 您的智能旅行伴侣</h2>
+                  
                   <p>欢迎来到VoyageGenie，一个专为热爱旅行的您设计的个性化旅行规划平台。我们深知每一次旅行都是一次全新的探索和发现，因此我们致力于打造一个能够激发您旅行灵感、满足您个性化需求的旅行社区。</p>
                   <p>**为什么选择VoyageGenie？**</p>
+                  <p></p>
                   <ul>
                       <li>个性化旅行体验：通过我们的AI助手，您可以获得量身定制的旅行建议和攻略，让您的旅程独一无二。</li>
                       <li>社区分享与交流：加入我们的旅行社区，分享您的旅行故事，获取灵感，与来自世界各地的旅行者交流心得。</li>
                       <li>丰富的旅行资源：无论是热门目的地还是隐秘的小众景点，VoyageGenie都能为您提供详尽的旅行信息和实用建议。</li>
                       <li>动态交互体验：我们的前端设计注重用户体验，无论是通过瀑布流浏览攻略，还是通过AI Chat进行实时互动，都能让您感受到流畅和便捷。</li>
-                      <li>响应式网页设计：无论您使用手机、平板还是电脑，VoyageGenie都能提供最佳的浏览体验。</li>
+                      <li>全平台同步：无论您使用手机、平板还是电脑，VoyageGenie都能提供最佳的浏览体验。</li>
                   </ul>
+                  <p></p>
                   <p>在VoyageGenie，我们相信旅行不仅仅是到达目的地，更是一段关于自我发现和世界认知的旅程。让我们一起启程，探索未知，记录美好，分享感动。</p>
                   <p><strong>加入VoyageGenie，让每一次旅行都成为您人生中难忘的篇章。</strong></p>
                 </div>
-
-
-
             </section>
+            <img alt="" src="/src/assets/genie.png" class="inserted-image">
+            </div>
         </el-main>
       <!-- </el-container> -->
     </div>
@@ -103,15 +106,16 @@ export default {
 }
 .main{
     position: relative;
-    text-align: center;
     font-size: 25px;
     font-weight: bold;
     
 }
 .inserted-image{
     /* max-width: 100%;  确保图片不会超过容器宽度 */
-    height: 30vh;
-    width: auto;
+    height: 80%;
+    width: 40%; /* 根据需要调整图片宽度 */
+    margin-top: 0%;
+    margin-right:-5%;
 }
 
 .title {
@@ -131,9 +135,19 @@ p {
   color: #fff; /* 结束语文字颜色为白色 */
 }
 
+li{
+  font-size: 20px;
+}
+
 @media (max-width: 768px) {
   .introduction-container {
     padding: 0 10px;
+  }
+  .container {
+    flex-direction:column; /* 桌面模式为左右布局 */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   .title {
@@ -157,6 +171,7 @@ p {
   padding: 50px;
   position: relative;
   overflow: visible;
+  flex: 1; /* 文本容器占据剩余空间 */
 }
 
 .introduction-container {
@@ -182,6 +197,11 @@ p {
   
   animation: moveBarrage 10s linear infinite; /* 动画 */
   opacity: 0.2;
+}
+.container {
+  display: flex;
+  margin: 10 auto;
+  justify-content: space-between; /* 根据需要调整 */
 }
 
 @keyframes moveBarrage {

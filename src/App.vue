@@ -402,11 +402,11 @@ import {
 .menu {
   z-index: 100;
   height: 11vh;
-  user-select: none;
+  user-select: none; 
 }
 .menu-item {
   width: 5vw;
-  font-size: 1.8vh;
+  font-size: 1.8vh; 
 }
 .menu-avatar {
   align-self: center;
@@ -419,6 +419,7 @@ import {
 .menu-avatar.ma-hover{
   scale: 2;
   transform: translateX(-40%) translateY(-10%);
+  
 }
 .el-menu--horizontal>.el-menu-item.is-active,
 .el-menu--horizontal>.el-menu-item {
@@ -497,7 +498,7 @@ import {
 .top-bar {
   position: fixed;
   background-color: var(--color-light);
-  height: 0.3vh;
+  height: 1vh;
   width: 100vw;
   top: 0;
   z-index: 1000000;
