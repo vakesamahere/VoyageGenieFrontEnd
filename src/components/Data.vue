@@ -225,7 +225,6 @@ watch(() => cover.value, (newVal, oldVal) => {
     showA.value = false;
     showBAndC.value = true;
     isUploadEnabled.value = true;
-    imageUrl.value = defaultImage.value;
   };
  
 </script>
