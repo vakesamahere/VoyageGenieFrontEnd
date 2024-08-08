@@ -30,7 +30,8 @@
 
 
 <script lang="ts" setup>
-  import axios from 'axios';
+  import router from '@/router';
+import axios from 'axios';
 import { ElNotification } from 'element-plus';
   import { ref,reactive,defineEmits } from 'vue';
   import { useStore } from 'vuex';
@@ -89,6 +90,7 @@ const handleLogin = async () => {
       store.commit('setUserName',resUserName)
       store.commit('setUserBio',resUserBio)
       emit('login');
+      router.push('/about')
     }
 };
 
