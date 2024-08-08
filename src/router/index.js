@@ -6,6 +6,19 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/',
+      name: 'about',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      // component: () => import('../views/AboutView.vue'),
+      component: () => import('../components/Help.vue'),
+      meta: { 
+        requiresAuth: true,
+        index:4
+      } 
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting
@@ -106,7 +119,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   // 测试，免登录
-  next()
+  // next()
   // 检查用户是否登录，如果未登录且尝试访问需要登录的页面，则跳转到登录界面
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const isLoggedIn = store.state.isLoggedIn;
