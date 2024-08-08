@@ -271,7 +271,7 @@ padding-left: 60px; /* 设置输入内容距离左边框 200px */
   color: white;
   font-size: 15px;
 height: 30px;
-width:80%;
+width:100%;
 display: flex;
 justify-content: center; 
 align-items: center; 
@@ -318,13 +318,24 @@ align-items: center;
     color: #8c939d;
     width: 70px;
     height: 70px;
+    min-width: 70px;
+    min-height: 70px;
+    max-width: 70px;
+    max-height: 70px;
     text-align: center;
     line-height: 70px;
   }
 .avatar-uploader .avatar {
   width: 70px;
   height: 70px;
+  min-width: 70px;
+  min-height: 70px;
+  max-width: 70px;
+  max-height: 70px;
   display: block;
-  border-radius: 0%;
+  border-radius: 50%;
+}
+.avatar-uploader {
+  border-radius: 50%;
 }
 </style>
