@@ -116,8 +116,8 @@ class="waterfall"
   </div>
   <!-- start of post-displaying -->
   <transition name="trans-post">
-    <div v-if="isPostDisplaying" class="post-display-box">
-      <PostDisplaying :postId="postDisplayingId" class="post-display" @closeSelf="isPostDisplaying=false" />
+    <div v-if="isPostDisplaying" class="post-display-box" :key="postVkey">
+      <PostDisplaying :postId="postDisplayingId" class="post-display" @closeSelf="closePost" />
     </div>
   </transition>
   <!-- end of post-displaying -->
@@ -188,7 +188,8 @@ export default{
       gapRatio:0.01,
       localList:[],
       isPostDisplaying:false,
-      postDisplayingId:0
+      postDisplayingId:0,
+      postVkey:0
     }
   },
   computed:{
@@ -299,6 +300,10 @@ export default{
       this.vkey+=1
       this.verifyRerander(this.vkey)
     },
+    closePost() {
+      this.isPostDisplaying=false,
+      this.postVkey+=1
+    },
     handleSubscribe(target){
       console.log('subscribe');
       const targetId = target.author
@@ -312,7 +317,7 @@ export default{
       target.subscribe = 1-target.subscribe
     },
     async autoRefresh(){
-      this.localList=this.localList.concat([])
+      // this.localList=this.localList.concat([])
       await setTimeout(() => {
         this.autoRefresh()
       }, 500);

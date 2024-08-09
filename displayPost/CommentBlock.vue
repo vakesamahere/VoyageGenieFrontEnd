@@ -134,6 +134,7 @@ export default {
   },
   methods:{
     handleSendComment(content,uid){
+      console.log('handle up',uid);
       this.$emit('sendComment',content,uid,true)
     },
     handleNewComment(content,){

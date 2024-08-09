@@ -180,6 +180,8 @@ export default {
     async handleCommentSend(commentString:string,commentId:number,reply:boolean) {
         console.log('comment hide');
         console.log(commentString);
+        console.log('receive comment_id',commentId);
+        
         const data={
             "user_id":this.$store.state.userId,
             "post_id":this.postId,

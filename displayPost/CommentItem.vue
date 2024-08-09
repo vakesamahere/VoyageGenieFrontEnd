@@ -14,16 +14,15 @@
         <button @click="createReply(comment.uid)" class="create-reply">
         回复
         </button>
-        <button @click="toggleReplies" class="reply-toggle" v-if="replies.length!=0">
+        <button @click="toggleReplies" class="reply-toggle" v-if="replies.length!=0" :key="vkey">
         {{ showReplies ? '收起回复' : '查看回复' }}
         </button>
       </div>
 
       <transition name="reply-transition">
-        <div class="reply-list hidden" :id="`replyContainer${comment.uid}`">
+        <div class="reply-list" :id="`replyContainer${comment.uid}`" v-show="showReplies" :key="vkey">
           <comment-item
             v-for="reply in replies"
-            :key="reply.uid"
             :comment="reply"
             :comments="comments"
             :parentName="getParentName"
@@ -79,6 +78,9 @@ export default {
       showReplies: false,
       dialogVisible: false,
       replyContent: '',
+      vkey:0,
+      replies:[],
+      currentCid:0
     };
   },
   computed: {
@@ -86,9 +88,6 @@ export default {
       get() {
         return this.$store.state.userId;
       }
-    },
-    replies() {
-      return this.comments.filter(c => c.comment_id === this.comment.uid);
     },
     getParentName() {
         if(this.root){
@@ -98,12 +97,23 @@ export default {
         }
     }
   },
+  mounted(){
+    this.replies = this.getReplies()
+    // setTimeout(() => {
+    //   this.vkey++;
+    // }, 200);
+  },
   methods: {
+    getReplies() {
+      console.log(this.comment.uid,this.comments.filter(c => c.comment_id === this.comment.uid));
+      return this.comments.filter(c => c.comment_id === this.comment.uid);
+    },
     toggleReplies() {
       this.showReplies = !this.showReplies;
       if(this.showReplies){
         document.getElementById(`replyContainer${this.comment.uid}`)?.classList.remove('hidden')
         document.getElementById(`replyContainer${this.comment.uid}`)?.classList.add('show')
+        this.vkey++;
       }else{
         document.getElementById(`replyContainer${this.comment.uid}`)?.classList.add('hidden')
         document.getElementById(`replyContainer${this.comment.uid}`)?.classList.remove('show')
@@ -111,15 +121,18 @@ export default {
     },
     createReply(uid) {
       console.log(`create a reply to the comment ${uid}`);
-      this.currentUid = uid;
+      this.currentCid = uid;
       this.dialogVisible = true;
+      console.log(`record comment_id ${this.currentCid}`);
     },
     submitReply() {
-      this.$emit('sendComment', this.replyContent, this.currentUid);
+      console.log('start handle up reply',this.currentCid);
+      this.$emit('sendComment', this.replyContent, this.currentCid);
       this.replyContent = '';
       this.dialogVisible = false;
     },
     handleSendComment(content, uid) {
+      console.log('handle up reply',uid);
       this.$emit('sendComment', content, uid);
     }
   }
