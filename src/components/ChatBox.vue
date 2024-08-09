@@ -19,7 +19,7 @@
               align-center
               >
                 <span>
-                  <PostBox v-if="post" :post="post"></PostBox>                
+                  <PostBox v-if="post" :post="post" :key="post.text"></PostBox>                
                 </span>
                 <template #footer>
                     <div class="dialog-footer">
@@ -48,7 +48,7 @@
             <!-- 输入框绑定 v-model 以获取用户输入 -->
             <!-- 按钮点击时触发 addTextDiv 方法 -->
             <el-button :disabled="isdisable" type="primary" @click="addTextDiv" @@keydown.enter="addTextDiv" style="margin-top: 60px;margin-left: 1%;background-color: var(--color-light);border: none;width:10%">发送</el-button>
-            <el-button :disabled="textList2=='{}'" @click="dialogVisible=true;post=JSON.parse(textList2)" style="margin-top: 60px;width:10%;margin-left: 1%;">预览</el-button>
+            <el-button :disabled="textList2=='{}'" @click="post=JSON.parse(textList2);dialogVisible=true;" style="margin-top: 60px;width:10%;margin-left: 1%;">预览</el-button>
            
           </div>
         </el-footer>
@@ -496,6 +496,7 @@ fetch('http://1.94.170.22:6001/chat', {
   }
 })
 .then(body => {
+  isdone.value=true;
   const reader = body!.getReader();
   const decoder = new TextDecoder('utf-8');
   index1.value=textList.value.length;
