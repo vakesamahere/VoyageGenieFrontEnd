@@ -47,7 +47,7 @@ import { ElNotification } from 'element-plus';
   const password = ref('');
   const code = ref('');
   const result=ref(0);
-  const data=ref({email,password,result});
+  const data=ref({email,"new_password":password,result});
   const response=ref();
 
 const handleRecover = async () =>  {
@@ -60,6 +60,8 @@ const handleRecover = async () =>  {
       console.error('There was an error sending the data!', error);
       response.value = { result: error.message };
     }
+    // alert(response.value)
+    console.log(response.value.result);    
     if(response.value.result==0){
       // alert('未查询到该用户！');
       ElNotification({
@@ -70,7 +72,17 @@ const handleRecover = async () =>  {
         offset:200
       })
     }
-    else{
+    if(response.value.result==-1){
+      // alert('未查询到该用户！');
+      ElNotification({
+        title:'Oh No',
+        type:'error',
+        message:'邮箱或密码不合法',
+        duration:1500,
+        offset:200
+      })
+    }
+    if(response.value.result==1){
       ElNotification({
         title:'Success',
         type:'success',

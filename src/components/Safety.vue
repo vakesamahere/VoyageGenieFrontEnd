@@ -110,27 +110,36 @@ watch(() => store.getters.getUserId, (newVal, oldVal) => {
                 console.error('There was an error sending the post!',error);
             }
         }
-        if(response.value.result==0)
-        {
-            // alert('修改失败！');
-            ElNotification({
-                title:'Oh No',
-                type:'error',
-                message:'修改失败...',
-                duration:1500,
-                offset:200
-            })
-        }
-        else{
-            // alert('修改成功！');
-            ElNotification({
-                title:'Success',
-                type:'success',
-                message:'修改成功',
-                duration:1500,
-                offset:200
-            })
-        }
+        if(response.value.result==0)    
+    if(response.value.result==0){
+      // alert('未查询到该用户！');
+      ElNotification({
+        title:'Oh No',
+        type:'error',
+        message:'未查询到该用户',
+        duration:1500,
+        offset:200
+      })
+    }
+    if(response.value.result==-1){
+      // alert('未查询到该用户！');
+      ElNotification({
+        title:'Oh No',
+        type:'error',
+        message:'邮箱或密码不合法',
+        duration:1500,
+        offset:200
+      })
+    }
+    if(response.value.result==1){
+      ElNotification({
+        title:'Success',
+        type:'success',
+        message:'密码已修改',
+        duration:1500,
+        offset:200
+      })
+    }
 
     }
     function click(){
